@@ -1,0 +1,10 @@
+# Public-domain-ish source videos for the fine-tune speaker (one English speaker).
+# These are public YouTube videos of a single talker, used as training data for a
+# zero-shot-beating fine-tune experiment. No personal data. ~65 min total.
+# One YouTube video id per line.
+OKf7PWd7QgA
+jMC_8q49rlM
+ZNKG8d0ujwo
+DfKn6GNQZe0
+wG0gRHd5MXA
+AGELqqSx_TU

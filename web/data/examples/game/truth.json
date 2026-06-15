@@ -1,0 +1,24 @@
+{
+ "truth": {
+  "326f24fa": {
+   "is_real": false,
+   "label": "clone"
+  },
+  "3d15f0ee": {
+   "is_real": false,
+   "label": "clone"
+  },
+  "607d1405": {
+   "is_real": true,
+   "label": "human"
+  },
+  "83bcdbe2": {
+   "is_real": false,
+   "label": "clone"
+  },
+  "b03b2605": {
+   "is_real": false,
+   "label": "clone"
+  }
+ }
+}

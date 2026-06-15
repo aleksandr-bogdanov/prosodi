@@ -1,0 +1,3 @@
+# the isolated env and all downloaded/generated data stay local
+.env/
+data/

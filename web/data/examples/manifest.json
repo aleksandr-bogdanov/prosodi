@@ -1,0 +1,1272 @@
+{
+ "galleries": [
+  {
+   "id": "donne-dream",
+   "title": "John Donne — The Dream",
+   "blurb": "A studio-clean reading. With clean input the clone lands close: register, pauses and the line-end falls all carry.",
+   "source": "LibriVox · public domain",
+   "original_url": "/examples/donne-dream/original.wav",
+   "prosody_url": "/examples/donne-dream/prosody.wav",
+   "view": {
+    "header": {
+     "duration_s": 15.07,
+     "n_words": 37,
+     "language": "en",
+     "f0_median_hz": 177.9,
+     "f0_range_st": 4.1,
+     "speech_rate_wps": 3.17,
+     "pause_count": 4,
+     "pause_total_s": 3.42
+    },
+    "tokens": [
+     {
+      "type": "word",
+      "text": "Dear",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 0.0,
+      "end": 0.4,
+      "f0": 181.7
+     },
+     {
+      "type": "word",
+      "text": "Love,",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 0.4,
+      "end": 0.94,
+      "f0": 169.0
+     },
+     {
+      "type": "pause",
+      "seconds": 0.4
+     },
+     {
+      "type": "word",
+      "text": "for",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.34,
+      "end": 1.46,
+      "f0": 196.9
+     },
+     {
+      "type": "word",
+      "text": "nothing",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.46,
+      "end": 1.72,
+      "f0": 195.4
+     },
+     {
+      "type": "word",
+      "text": "less",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.72,
+      "end": 2.14,
+      "f0": 187.6
+     },
+     {
+      "type": "word",
+      "text": "than",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.14,
+      "end": 2.4,
+      "f0": 183.1
+     },
+     {
+      "type": "word",
+      "text": "thee",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.4,
+      "end": 2.66,
+      "f0": 185.2
+     },
+     {
+      "type": "word",
+      "text": "would",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.66,
+      "end": 2.88,
+      "f0": 176.9
+     },
+     {
+      "type": "word",
+      "text": "I",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.88,
+      "end": 3.08,
+      "f0": 169.6
+     },
+     {
+      "type": "word",
+      "text": "have",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 3.08,
+      "end": 3.32,
+      "f0": 173.8
+     },
+     {
+      "type": "word",
+      "text": "broke",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 3.32,
+      "end": 3.6,
+      "f0": 178.1
+     },
+     {
+      "type": "word",
+      "text": "this",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 3.6,
+      "end": 3.92,
+      "f0": 169.0
+     },
+     {
+      "type": "word",
+      "text": "happy",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 3.92,
+      "end": 4.22,
+      "f0": 161.8
+     },
+     {
+      "type": "word",
+      "text": "dream.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 4.22,
+      "end": 4.64,
+      "f0": 158.0
+     },
+     {
+      "type": "pause",
+      "seconds": 1.3
+     },
+     {
+      "type": "word",
+      "text": "It",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 5.92,
+      "end": 6.12,
+      "f0": 189.4
+     },
+     {
+      "type": "word",
+      "text": "was",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 6.12,
+      "end": 6.3,
+      "f0": 197.1
+     },
+     {
+      "type": "word",
+      "text": "a",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 6.3,
+      "end": 6.5,
+      "f0": 193.0
+     },
+     {
+      "type": "word",
+      "text": "theme",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 6.5,
+      "end": 6.8,
+      "f0": 202.1
+     },
+     {
+      "type": "word",
+      "text": "for",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 6.8,
+      "end": 7.18,
+      "f0": 181.0
+     },
+     {
+      "type": "word",
+      "text": "reason",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 7.18,
+      "end": 7.62,
+      "f0": 181.1
+     },
+     {
+      "type": "word",
+      "text": "much",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 7.62,
+      "end": 8.06,
+      "f0": 163.2
+     },
+     {
+      "type": "word",
+      "text": "too",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 8.06,
+      "end": 8.4,
+      "f0": 179.3
+     },
+     {
+      "type": "word",
+      "text": "strong",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 8.4,
+      "end": 8.8,
+      "f0": 173.1
+     },
+     {
+      "type": "word",
+      "text": "for",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 8.8,
+      "end": 9.06,
+      "f0": 171.4
+     },
+     {
+      "type": "word",
+      "text": "fantasy.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 9.06,
+      "end": 9.6,
+      "f0": 164.9
+     },
+     {
+      "type": "pause",
+      "seconds": 0.9
+     },
+     {
+      "type": "word",
+      "text": "Therefore",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 10.56,
+      "end": 11.0,
+      "f0": 193.2
+     },
+     {
+      "type": "word",
+      "text": "thou",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 11.0,
+      "end": 11.38,
+      "f0": 186.6
+     },
+     {
+      "type": "word",
+      "text": "wakest",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 11.38,
+      "end": 11.92,
+      "f0": 176.4
+     },
+     {
+      "type": "word",
+      "text": "me",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 11.92,
+      "end": 12.1,
+      "f0": 183.5
+     },
+     {
+      "type": "word",
+      "text": "wisely.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 12.1,
+      "end": 12.6,
+      "f0": 173.3
+     },
+     {
+      "type": "pause",
+      "seconds": 0.8
+     },
+     {
+      "type": "word",
+      "text": "Yet",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 13.5,
+      "end": 13.7,
+      "f0": 191.1
+     },
+     {
+      "type": "word",
+      "text": "my",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 13.7,
+      "end": 13.92,
+      "f0": 187.2
+     },
+     {
+      "type": "word",
+      "text": "dream",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 13.92,
+      "end": 14.36,
+      "f0": 188.1
+     },
+     {
+      "type": "word",
+      "text": "thou",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 14.36,
+      "end": 14.78,
+      "f0": 180.6
+     },
+     {
+      "type": "word",
+      "text": "breakest",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 14.78,
+      "end": 15.04,
+      "f0": 180.7
+     },
+     {
+      "type": "word",
+      "text": "in",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 15.04,
+      "end": 15.04,
+      "f0": null
+     },
+     {
+      "type": "word",
+      "text": "me.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 15.04,
+      "end": 15.04,
+      "f0": null
+     }
+    ],
+    "global": null,
+    "notation": "# _win.wav\n# duration 15.07s | words 37 | lang en\n# F0 median 177.9 Hz | F0 range (p5-p95) 4.1 st\n# rate 3.17 w/s speaking | pauses 4 (3.42s total)\n\nDear Love, <pause 0.4s> for nothing less than thee would *I* have broke this happy dream. <pause\n1.3s> It was a theme for reason much too strong for fantasy. <pause 0.9s> Therefore *thou* wakest me\nwisely. <pause 0.8s> *Yet* my dream thou breakest in me.\n"
+   },
+   "scorecard": {
+    "original": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/donne-dream/original.wav",
+    "render": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/donne-dream/prosody.wav",
+    "words": {
+     "orig": 37,
+     "rend": 42,
+     "aligned": 37
+    },
+    "pauses": {
+     "spec": 4,
+     "matched": 4,
+     "recall": 1.0,
+     "mean_abs_err_s": 0.143,
+     "mean_signed_err_s": 0.081,
+     "inserted": 2
+    },
+    "tempo_spans": {
+     "spec": 0,
+     "scored": 0,
+     "direction_agree": 0,
+     "magnitude_ratio": null,
+     "spans": []
+    },
+    "stretch": {
+     "spec": 0,
+     "scored": 0,
+     "realization_ratio": null,
+     "words": []
+    },
+    "speech_rate": {
+     "orig_wps": 3.17,
+     "rend_wps": 4.39,
+     "ratio": 1.38
+    },
+    "f0": {
+     "median_offset_st": -0.23,
+     "contour_r": 0.521,
+     "contour_rmse_st": 0.93,
+     "n_words": 34
+    }
+   }
+  },
+  {
+   "id": "lovecraft-city",
+   "title": "H. P. Lovecraft — The City",
+   "blurb": "A different reader, a different voice. The notation is the same deterministic measure; only the speaker baseline changes.",
+   "source": "LibriVox · public domain",
+   "original_url": "/examples/lovecraft-city/original.wav",
+   "prosody_url": "/examples/lovecraft-city/prosody.wav",
+   "view": {
+    "header": {
+     "duration_s": 15.22,
+     "n_words": 15,
+     "language": "en",
+     "f0_median_hz": 113.6,
+     "f0_range_st": 10.1,
+     "speech_rate_wps": 1.61,
+     "pause_count": 4,
+     "pause_total_s": 2.64
+    },
+    "tokens": [
+     {
+      "type": "word",
+      "text": "Howard",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 0.0,
+      "end": 0.26,
+      "f0": 149.1
+     },
+     {
+      "type": "word",
+      "text": "Phillips",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 0.26,
+      "end": 0.68,
+      "f0": 150.6
+     },
+     {
+      "type": "word",
+      "text": "Lovecraft.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "fall",
+      "tempo": null,
+      "start": 0.68,
+      "end": 1.22,
+      "f0": 110.1
+     },
+     {
+      "type": "pause",
+      "seconds": 1.0
+     },
+     {
+      "type": "word",
+      "text": "Read",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.78,
+      "end": 2.24,
+      "f0": 107.9
+     },
+     {
+      "type": "word",
+      "text": "for",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.24,
+      "end": 2.42,
+      "f0": 106.5
+     },
+     {
+      "type": "word",
+      "text": "LibriVox",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.42,
+      "end": 2.98,
+      "f0": 131.0
+     },
+     {
+      "type": "word",
+      "text": ".org",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "fall",
+      "tempo": null,
+      "start": 2.98,
+      "end": 3.54,
+      "f0": 111.4
+     },
+     {
+      "type": "pause",
+      "seconds": 0.4
+     },
+     {
+      "type": "word",
+      "text": "by",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 3.54,
+      "end": 4.12,
+      "f0": 92.2
+     },
+     {
+      "type": "word",
+      "text": "Kane",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 4.12,
+      "end": 4.44,
+      "f0": 109.6
+     },
+     {
+      "type": "word",
+      "text": "Perlich.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "fall",
+      "tempo": null,
+      "start": 4.44,
+      "end": 4.92,
+      "f0": 110.6
+     },
+     {
+      "type": "pause",
+      "seconds": 0.9
+     },
+     {
+      "type": "word",
+      "text": "Kane",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 5.4,
+      "end": 5.92,
+      "f0": 116.1
+     },
+     {
+      "type": "word",
+      "text": "Perlich",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "fall",
+      "tempo": null,
+      "start": 5.92,
+      "end": 6.48,
+      "f0": 124.3
+     },
+     {
+      "type": "pause",
+      "seconds": 0.3
+     },
+     {
+      "type": "word",
+      "text": "at",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 6.48,
+      "end": 6.82,
+      "f0": 89.8
+     },
+     {
+      "type": "word",
+      "text": "gmail",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 6.82,
+      "end": 7.36,
+      "f0": 98.1
+     },
+     {
+      "type": "word",
+      "text": ".com.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 7.36,
+      "end": 8.0,
+      "f0": 89.1
+     }
+    ],
+    "global": null,
+    "notation": "# _win.wav\n# duration 15.22s | words 15 | lang en\n# F0 median 113.6 Hz | F0 range (p5-p95) 10.1 st\n# rate 1.61 w/s speaking | pauses 4 (2.64s total)\n\n*Howard* *Phillips* Lovecraft. <fall> <pause 1.0s> Read for LibriVox .org <fall> <pause 0.4s> by\nKane Perlich. <fall> <pause 0.9s> Kane Perlich <fall> <pause 0.3s> at gmail .com.\n"
+   },
+   "scorecard": {
+    "original": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/lovecraft-city/original.wav",
+    "render": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/lovecraft-city/prosody.wav",
+    "words": {
+     "orig": 15,
+     "rend": 11,
+     "aligned": 8
+    },
+    "pauses": {
+     "spec": 4,
+     "matched": 3,
+     "recall": 0.75,
+     "mean_abs_err_s": 0.384,
+     "mean_signed_err_s": 0.384,
+     "inserted": 1
+    },
+    "tempo_spans": {
+     "spec": 0,
+     "scored": 0,
+     "direction_agree": 0,
+     "magnitude_ratio": null,
+     "spans": []
+    },
+    "stretch": {
+     "spec": 0,
+     "scored": 0,
+     "realization_ratio": null,
+     "words": []
+    },
+    "speech_rate": {
+     "orig_wps": 1.61,
+     "rend_wps": 2.81,
+     "ratio": 1.75
+    },
+    "f0": {
+     "median_offset_st": 0.24,
+     "contour_r": -0.382,
+     "contour_rmse_st": 4.77,
+     "n_words": 8
+    }
+   }
+  },
+  {
+   "id": "herbert-avarice",
+   "title": "George Herbert — Avarice",
+   "blurb": "Short and measured. Watch the stretch marks land on the drawled words and the pauses on the line breaks.",
+   "source": "LibriVox · public domain",
+   "original_url": "/examples/herbert-avarice/original.wav",
+   "prosody_url": "/examples/herbert-avarice/prosody.wav",
+   "view": {
+    "header": {
+     "duration_s": 14.1,
+     "n_words": 38,
+     "language": "en",
+     "f0_median_hz": 95.4,
+     "f0_range_st": 10.7,
+     "speech_rate_wps": 3.6,
+     "pause_count": 5,
+     "pause_total_s": 3.09
+    },
+    "tokens": [
+     {
+      "type": "word",
+      "text": "Money,",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 0.0,
+      "end": 0.68,
+      "f0": 121.4
+     },
+     {
+      "type": "word",
+      "text": "thou",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.08,
+      "end": 1.2,
+      "f0": 84.5
+     },
+     {
+      "type": "word",
+      "text": "bane",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.2,
+      "end": 1.58,
+      "f0": 96.1
+     },
+     {
+      "type": "word",
+      "text": "of",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.58,
+      "end": 1.7,
+      "f0": 91.6
+     },
+     {
+      "type": "word",
+      "text": "bliss",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 1.7,
+      "end": 2.02,
+      "f0": 89.4
+     },
+     {
+      "type": "word",
+      "text": "and",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.02,
+      "end": 2.4,
+      "f0": null
+     },
+     {
+      "type": "word",
+      "text": "source",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.4,
+      "end": 2.7,
+      "f0": 89.1
+     },
+     {
+      "type": "word",
+      "text": "of",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 2.7,
+      "end": 2.92,
+      "f0": 84.7
+     },
+     {
+      "type": "word",
+      "text": "woe,",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "rise",
+      "tempo": null,
+      "start": 2.92,
+      "end": 3.68,
+      "f0": 91.0
+     },
+     {
+      "type": "pause",
+      "seconds": 0.6
+     },
+     {
+      "type": "word",
+      "text": "Whence",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 3.88,
+      "end": 4.14,
+      "f0": 184.1
+     },
+     {
+      "type": "word",
+      "text": "comes",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 4.14,
+      "end": 4.38,
+      "f0": 161.6
+     },
+     {
+      "type": "word",
+      "text": "thou",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 4.38,
+      "end": 4.8,
+      "f0": 83.1
+     },
+     {
+      "type": "word",
+      "text": "that",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 4.8,
+      "end": 5.22,
+      "f0": null
+     },
+     {
+      "type": "pause",
+      "seconds": 0.4
+     },
+     {
+      "type": "word",
+      "text": "thou",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 5.22,
+      "end": 5.4,
+      "f0": 113.9
+     },
+     {
+      "type": "word",
+      "text": "art",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 5.4,
+      "end": 5.56,
+      "f0": 114.3
+     },
+     {
+      "type": "word",
+      "text": "so",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 5.56,
+      "end": 5.76,
+      "f0": 103.5
+     },
+     {
+      "type": "word",
+      "text": "fresh",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 5.76,
+      "end": 6.16,
+      "f0": 130.3
+     },
+     {
+      "type": "word",
+      "text": "and",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 6.16,
+      "end": 6.44,
+      "f0": 99.7
+     },
+     {
+      "type": "word",
+      "text": "fine?",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "fall",
+      "tempo": null,
+      "start": 6.44,
+      "end": 6.86,
+      "f0": 98.9
+     },
+     {
+      "type": "pause",
+      "seconds": 0.8
+     },
+     {
+      "type": "word",
+      "text": "I",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 7.76,
+      "end": 7.84,
+      "f0": 77.4
+     },
+     {
+      "type": "word",
+      "text": "know",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 7.84,
+      "end": 7.98,
+      "f0": 83.6
+     },
+     {
+      "type": "word",
+      "text": "thy",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 7.98,
+      "end": 8.14,
+      "f0": 116.7
+     },
+     {
+      "type": "word",
+      "text": "parentage",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 8.14,
+      "end": 8.76,
+      "f0": 116.2
+     },
+     {
+      "type": "word",
+      "text": "is",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 8.76,
+      "end": 8.92,
+      "f0": 82.8
+     },
+     {
+      "type": "word",
+      "text": "base",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 8.92,
+      "end": 9.22,
+      "f0": 106.6
+     },
+     {
+      "type": "word",
+      "text": "and",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 9.22,
+      "end": 9.54,
+      "f0": 78.4
+     },
+     {
+      "type": "word",
+      "text": "low,",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "rise",
+      "tempo": null,
+      "start": 9.54,
+      "end": 9.84,
+      "f0": 87.8
+     },
+     {
+      "type": "pause",
+      "seconds": 0.6
+     },
+     {
+      "type": "word",
+      "text": "Man",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 10.48,
+      "end": 10.68,
+      "f0": 83.1
+     },
+     {
+      "type": "word",
+      "text": "found",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 10.68,
+      "end": 10.98,
+      "f0": 107.1
+     },
+     {
+      "type": "word",
+      "text": "thee",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 10.98,
+      "end": 11.16,
+      "f0": 93.0
+     },
+     {
+      "type": "word",
+      "text": "poor",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 11.16,
+      "end": 11.48,
+      "f0": 115.2
+     },
+     {
+      "type": "word",
+      "text": "and",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 11.48,
+      "end": 11.74,
+      "f0": 80.1
+     },
+     {
+      "type": "word",
+      "text": "dirty",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 11.74,
+      "end": 12.1,
+      "f0": 99.2
+     },
+     {
+      "type": "word",
+      "text": "in",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 12.1,
+      "end": 12.36,
+      "f0": 84.7
+     },
+     {
+      "type": "word",
+      "text": "a",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 12.36,
+      "end": 12.44,
+      "f0": 85.1
+     },
+     {
+      "type": "word",
+      "text": "mine.",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 12.44,
+      "end": 12.76,
+      "f0": 85.2
+     },
+     {
+      "type": "pause",
+      "seconds": 0.8
+     },
+     {
+      "type": "word",
+      "text": "Surely",
+      "emphasized": true,
+      "stretched": null,
+      "boundary": null,
+      "tempo": null,
+      "start": 13.52,
+      "end": 13.78,
+      "f0": 116.7
+     },
+     {
+      "type": "word",
+      "text": "thou—",
+      "emphasized": false,
+      "stretched": null,
+      "boundary": "fall",
+      "tempo": null,
+      "start": 13.78,
+      "end": 14.08,
+      "f0": 89.2
+     }
+    ],
+    "global": null,
+    "notation": "# _win.wav\n# duration 14.1s | words 38 | lang en\n# F0 median 95.4 Hz | F0 range (p5-p95) 10.7 st\n# rate 3.6 w/s speaking | pauses 5 (3.09s total)\n\nMoney, thou bane of bliss and source of woe, <rise> <pause 0.6s> *Whence* *comes* thou that <pause\n0.4s> thou *art* so fresh and fine? <fall> <pause 0.8s> I know *thy* parentage is base and low,\n<rise> <pause 0.6s> Man found thee poor and dirty in a mine. <pause 0.8s> *Surely* thou— <fall>\n"
+   },
+   "scorecard": {
+    "original": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/herbert-avarice/original.wav",
+    "render": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/herbert-avarice/prosody.wav",
+    "words": {
+     "orig": 38,
+     "rend": 44,
+     "aligned": 34
+    },
+    "pauses": {
+     "spec": 5,
+     "matched": 5,
+     "recall": 1.0,
+     "mean_abs_err_s": 0.032,
+     "mean_signed_err_s": 0.032,
+     "inserted": 0
+    },
+    "tempo_spans": {
+     "spec": 0,
+     "scored": 0,
+     "direction_agree": 0,
+     "magnitude_ratio": null,
+     "spans": []
+    },
+    "stretch": {
+     "spec": 0,
+     "scored": 0,
+     "realization_ratio": null,
+     "words": []
+    },
+    "speech_rate": {
+     "orig_wps": 3.6,
+     "rend_wps": 4.34,
+     "ratio": 1.21
+    },
+    "f0": {
+     "median_offset_st": -0.76,
+     "contour_r": 0.581,
+     "contour_rmse_st": 3.0,
+     "n_words": 32
+    }
+   }
+  }
+ ],
+ "game": {
+  "items": [
+   {
+    "id": "326f24fa",
+    "url": "/examples/game/item_0.wav",
+    "position": 0
+   },
+   {
+    "id": "3d15f0ee",
+    "url": "/examples/game/item_1.wav",
+    "position": 1
+   },
+   {
+    "id": "607d1405",
+    "url": "/examples/game/item_2.wav",
+    "position": 2
+   },
+   {
+    "id": "83bcdbe2",
+    "url": "/examples/game/item_3.wav",
+    "position": 3
+   },
+   {
+    "id": "b03b2605",
+    "url": "/examples/game/item_4.wav",
+    "position": 4
+   }
+  ],
+  "truth_url": "/examples/game/truth.json",
+  "target_text": "Dear Love, for nothing less than thee would I have broke this happy dream. It was a theme for reason much too strong for fantasy."
+ }
+}

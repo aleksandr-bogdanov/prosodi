@@ -1,0 +1,49 @@
+[project]
+name = "prosodi"
+version = "0.1.0"
+description = "Annotate dictation transcripts with the prosody that plain STT discards"
+requires-python = ">=3.12"
+dependencies = [
+    "praat-parselmouth>=0.4.7",
+    "mlx-whisper>=0.4.3",
+    "numpy>=1.26",
+    "rich>=13.7",
+]
+
+# Deps used only by the standalone probe scripts (test_*.py at the repo root),
+# never imported by the prosodi package itself.
+[dependency-groups]
+# Optional synthesis backends for `prosodi roundtrip --target f5`:
+# uv sync --group synth (the f5 model lands in the HuggingFace cache on first use).
+synth = [
+    "f5-tts-mlx>=0.2.6",
+    "soundfile>=0.12",
+    # Clause shaping for the f5 clone: librosa.effects.trim removes f5's own
+    # edge silence (seam suppression) and time_stretch fits each clause to its
+    # measured duration (rate correction). Both are renderer-side, never in the record.
+    "librosa>=0.10",
+]
+probes = [
+    "opensmile>=2.5",
+    "librosa>=0.10",
+    "soundfile>=0.12",
+    "silero-vad>=5.1",
+    "torch>=2.4",
+]
+# The local web app (web/server): uv run --group web --group synth prosodi serve.
+web = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.30",
+    "python-multipart>=0.0.9",
+    "soundfile>=0.12",
+]
+
+[project.scripts]
+prosodi = "prosodi.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["prosodi"]

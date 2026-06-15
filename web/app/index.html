@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>prosodi — speech, without losing the speech</title>
+    <meta name="description" content="Annotate a recording with the prosody plain transcription throws away, hear it cloned back, and tell the real voice from the clone." />
+    <script>
+      // Set the theme before paint to avoid a flash. Light is the default.
+      (function () {
+        try {
+          var t = localStorage.getItem("prosodi-theme");
+          if (t === "dark") document.documentElement.classList.add("dark");
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+# runtime upload/render scratch (per-session, never source)
+.work/
+# persisted voices (cloned references, local-only, never committed)
+.voices/
+# frontend build artifacts (regenerate: cd app && bun run build)
+app/node_modules/
+app/dist/
+app/tsconfig.tsbuildinfo
+# python bytecode
+**/__pycache__/
