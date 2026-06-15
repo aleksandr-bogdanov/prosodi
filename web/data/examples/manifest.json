@@ -447,8 +447,8 @@
     "notation": "# _win.wav\n# duration 15.07s | words 37 | lang en\n# F0 median 177.9 Hz | F0 range (p5-p95) 4.1 st\n# rate 3.17 w/s speaking | pauses 4 (3.42s total)\n\nDear Love, <pause 0.4s> for nothing less than thee would *I* have broke this happy dream. <pause\n1.3s> It was a theme for reason much too strong for fantasy. <pause 0.9s> Therefore *thou* wakest me\nwisely. <pause 0.8s> *Yet* my dream thou breakest in me.\n"
    },
    "scorecard": {
-    "original": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/donne-dream/original.wav",
-    "render": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/donne-dream/prosody.wav",
+    "original": "web/data/examples/donne-dream/original.wav",
+    "render": "web/data/examples/donne-dream/prosody.wav",
     "words": {
      "orig": 37,
      "rend": 42,
@@ -693,8 +693,8 @@
     "notation": "# _win.wav\n# duration 15.22s | words 15 | lang en\n# F0 median 113.6 Hz | F0 range (p5-p95) 10.1 st\n# rate 1.61 w/s speaking | pauses 4 (2.64s total)\n\n*Howard* *Phillips* Lovecraft. <fall> <pause 1.0s> Read for LibriVox .org <fall> <pause 0.4s> by\nKane Perlich. <fall> <pause 0.9s> Kane Perlich <fall> <pause 0.3s> at gmail .com.\n"
    },
    "scorecard": {
-    "original": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/lovecraft-city/original.wav",
-    "render": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/lovecraft-city/prosody.wav",
+    "original": "web/data/examples/lovecraft-city/original.wav",
+    "render": "web/data/examples/lovecraft-city/prosody.wav",
     "words": {
      "orig": 15,
      "rend": 11,
@@ -1196,8 +1196,8 @@
     "notation": "# _win.wav\n# duration 14.1s | words 38 | lang en\n# F0 median 95.4 Hz | F0 range (p5-p95) 10.7 st\n# rate 3.6 w/s speaking | pauses 5 (3.09s total)\n\nMoney, thou bane of bliss and source of woe, <rise> <pause 0.6s> *Whence* *comes* thou that <pause\n0.4s> thou *art* so fresh and fine? <fall> <pause 0.8s> I know *thy* parentage is base and low,\n<rise> <pause 0.6s> Man found thee poor and dirty in a mine. <pause 0.8s> *Surely* thou— <fall>\n"
    },
    "scorecard": {
-    "original": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/herbert-avarice/original.wav",
-    "render": "/Users/abogdanov/IdeaProjects/prosody/web/data/examples/herbert-avarice/prosody.wav",
+    "original": "web/data/examples/herbert-avarice/original.wav",
+    "render": "web/data/examples/herbert-avarice/prosody.wav",
     "words": {
      "orig": 38,
      "rend": 44,

@@ -29,7 +29,7 @@ CONDITIONS = ("prosody", "control")
 # owner's vault), kept so local runs need no env setup.
 DEFAULT_REF_DIR = Path(os.environ.get(
     "PROSODI_REF_DIR",
-    "/Users/abogdanov/imprint-vault/raw/adhoc/prosody-research/samples"))
+    str(Path(__file__).resolve().parent.parent / "voice-samples")))
 
 
 class Backend(Protocol):
