@@ -52,6 +52,7 @@ def segment_and_transcribe(wavs: list[Path]) -> Path:
     n = 0
     with meta.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, delimiter="|")
+        w.writerow(["audio_file", "text"])  # prepare_csv_wavs requires this exact header
         for wav in wavs:
             print(f">>> transcribing {wav.name}", flush=True)
             audio, sr = sf.read(str(wav))
@@ -68,25 +69,51 @@ def segment_and_transcribe(wavs: list[Path]) -> Path:
                         a, b = int(start * sr), int(word.end * sr)
                         clip = WAVS / f"clip_{n:06d}.wav"
                         sf.write(str(clip), audio[a:b], sr, subtype="PCM_16")
-                        w.writerow([f"wavs/{clip.name}", buf.strip()])
+                        w.writerow([str(clip.resolve()), buf.strip()])  # must be absolute
                         n += 1
                         buf, start = "", None
     print(f">>> {n} clips, metadata at {meta}", flush=True)
     return meta
 
 
+DATASET_NAME = "prosodi_speaker"
+
+
+def f5_data_dir() -> Path:
+    """Where F5-TTS looks for a named dataset at train time.
+
+    load_dataset("<name>") reads <f5_tts pkg>/../../data/<name>_pinyin, which on a
+    venv resolves to .env/lib/pythonX.Y/data/ (NOT site-packages/data). The dataset
+    has to land there or training cannot find it. (Found by the M5 run.)
+    """
+    import f5_tts
+    return Path(f5_tts.__file__).resolve().parent.parent.parent / "data"
+
+
 def build_dataset(meta: Path) -> None:
-    """Hand the clips to F5-TTS. The CLI name/flags are version-specific: verify."""
-    print(">>> building the F5-TTS dataset (verify the prepare-csv-wavs invocation)",
-          flush=True)
-    # Common form: prepare_csv_wavs <input_dir_with_metadata.csv> <output_dataset_dir>
-    out = HERE / "data" / "dataset"
-    try:
-        subprocess.run([sys.executable, "-m", "f5_tts.train.datasets.prepare_csv_wavs",
-                        str(CLIPS), str(out)], check=True)
-    except Exception as e:
-        print(f"prepare_csv_wavs call failed ({e}). Check the installed F5-TTS data "
-              f"tooling and run it by hand on {CLIPS} -> {out}.", file=sys.stderr)
+    """Hand the metadata CSV to F5-TTS prepare_csv_wavs, writing to f5's data dir.
+
+    Two M5-found requirements: prepare_csv_wavs takes the CSV FILE (not the dir),
+    and a finetune build asserts the Emilia vocab exists, which the pip install does
+    not ship - copy it from the bundled inference examples.
+    """
+    import shutil
+    import f5_tts
+
+    data_root = f5_data_dir()
+    out = data_root / f"{DATASET_NAME}_pinyin"
+    f5_pkg = Path(f5_tts.__file__).resolve().parent
+
+    emilia = data_root / "Emilia_ZH_EN_pinyin"
+    emilia.mkdir(parents=True, exist_ok=True)
+    vocab_src = f5_pkg / "infer" / "examples" / "vocab.txt"
+    if vocab_src.exists() and not (emilia / "vocab.txt").exists():
+        shutil.copy(vocab_src, emilia / "vocab.txt")
+
+    print(f">>> building dataset '{DATASET_NAME}' -> {out}", flush=True)
+    subprocess.run([sys.executable, "-m", "f5_tts.train.datasets.prepare_csv_wavs",
+                    str(meta), str(out)], check=True)
+    print(f">>> dataset ready at {out}")
 
 
 if __name__ == "__main__":

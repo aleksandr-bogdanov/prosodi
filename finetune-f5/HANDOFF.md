@@ -11,6 +11,18 @@ Same speaker as the XTTS run (`sources.txt`, ~65 min of public YouTube audio). T
 XTTS kit (`../finetune/`) is the proven template; this mirrors it with F5-TTS in
 place of coqui.
 
+## UPDATE: the M5 already ran this (see RESULTS-M5.md)
+
+A first run happened on the M5. The data prep works (691 clips, 0.92 h, Arrow
+dataset built) and the script bugs it found are now fixed in `prepare.py` and
+`train.py` (CSV header + absolute paths + the f5 data-dir location + the Emilia
+vocab copy + the right base checkpoint). What it learned: F5-TTS training on the M5
+is ~28 s/update with MPS CPU-fallback spikes (a few fast steps, then a multi-minute
+spike), projecting ~9 hours. That is the go-cloud zone. So the run belongs on a
+cloud GPU. `RESULTS-M5.md` has the exact step times and a cloud-resume recipe
+(rsync the dataset over, or just re-run `prepare.py` on the box). On an A10G or
+better, the full run should finish in under an hour.
+
 ## The one prompt (paste into Claude Code on the M5, from the repo root)
 
 > Pick up the prosodi f5 voice fine-tune. Read `finetune-f5/HANDOFF.md` and run it

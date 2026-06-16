@@ -33,13 +33,19 @@ def main() -> None:
               f"`ls finetune-f5/.env/bin | grep f5`", file=sys.stderr)
         sys.exit(1)
     cmd = [str(FINETUNE_CLI), "--finetune",
+           # exp_name picks the base checkpoint; be explicit (F5TTS_Base / E2TTS_Base
+           # download different weights). Found by the M5 run.
+           "--exp_name", "F5TTS_v1_Base",
            "--dataset_name", DATASET,
            "--learning_rate", os.environ.get("LR", "1e-5"),
            "--epochs", os.environ.get("EPOCHS", "10"),
            "--batch_size_per_gpu", os.environ.get("BATCH", "3200"),
            "--batch_size_type", "frame",
            "--num_warmup_updates", "100",
-           "--save_per_updates", "500"]
+           "--save_per_updates", "500",
+           "--keep_last_n_checkpoints", "3"]  # default -1 keeps all and fills disk
+    # NOTE: do not add `--logger None` - argparse treats None as the python value,
+    # not the string; omit the flag for no logger.
     print(">>> verify these flags with `f5-tts_finetune-cli --help` first", flush=True)
     print(">>> running:", " ".join(cmd), flush=True)
     print(">>> WATCH THE FIRST ~20 STEPS for step time, then decide local vs cloud.",
