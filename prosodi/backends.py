@@ -368,7 +368,8 @@ class XTTSBackend:
         self.vocab = Path(vocab) if vocab else model_dir / "vocab.json"
         self.ref = Path(ref) if ref else ft / "data" / "dataset" / "wavs" / "reference.wav"
         self.sidecar_python = Path(sidecar_python) if sidecar_python else ft / ".env" / "bin" / "python"
-        self.sidecar_script = ft / "xtts_sidecar.py"
+        self.server_script = ft / "xtts_server.py"
+        self.port = int(os.environ.get("PROSODI_XTTS_PORT", "8799"))
         self.trim_seams = trim_seams
         self.fit_tempo = fit_tempo
         self.clause_min_pause_s = clause_min_pause_s
@@ -377,20 +378,50 @@ class XTTSBackend:
                 raise RuntimeError(f"xtts backend: missing {p} (restore the M5 model "
                                    f"and build finetune/.env, see finetune/RESTORE.md)")
 
-    def _sidecar_render(self, texts: list[str]) -> list[Path]:
-        """Render every text in one sidecar call (model loads once)."""
-        import json
+    def _ensure_server(self) -> None:
+        """Start the warm sidecar if it is not already up, and wait for the model.
+
+        The model is ~5GB and loads in ~60s. Keeping it hot in a long-running
+        localhost process is what makes a reconstruct fast instead of a 60s reload
+        every time. Started on first use, then reused; localhost-bind only.
+        """
         import subprocess
+        import time
+        import urllib.request
+        url = f"http://127.0.0.1:{self.port}/"
+
+        def ready() -> bool:
+            try:
+                with urllib.request.urlopen(url, timeout=2) as r:
+                    return r.status == 200
+            except Exception:
+                return False
+
+        if ready():
+            return
+        subprocess.Popen([str(self.sidecar_python), str(self.server_script), str(self.port)],
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                         start_new_session=True)
+        for _ in range(150):  # up to ~150s for the model to load
+            time.sleep(1)
+            if ready():
+                return
+        raise RuntimeError("xtts sidecar did not become ready (check finetune/.env)")
+
+    def _sidecar_render(self, texts: list[str]) -> list[Path]:
+        """Render every text on the warm sidecar (model already hot)."""
+        import json
         import tempfile
+        import urllib.request
+        self._ensure_server()
         work = Path(tempfile.mkdtemp(prefix="xtts-side-"))
-        req = work / "req.json"
-        req.write_text(json.dumps({
-            "ckpt": str(self.ckpt), "config": str(self.config), "vocab": str(self.vocab),
-            "ref": str(self.ref), "texts": texts, "out_dir": str(work),
-        }), encoding="utf-8")
-        subprocess.run([str(self.sidecar_python), str(self.sidecar_script), str(req)],
-                       check=True)
-        return [work / f"clip_{i}.wav" for i in range(len(texts))]
+        req = json.dumps({"texts": texts, "out_dir": str(work)}).encode()
+        r = urllib.request.urlopen(
+            urllib.request.Request(f"http://127.0.0.1:{self.port}/", data=req,
+                                   headers={"Content-Type": "application/json"}),
+            timeout=600)
+        clips = json.loads(r.read())["clips"]
+        return [Path(c) for c in clips]
 
     def _fit_clause(self, wave, target_s: float):
         """Trim edge silence, time-stretch the speech to target_s (same as f5)."""
