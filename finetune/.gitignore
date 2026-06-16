@@ -1,3 +1,5 @@
 # the isolated env and all downloaded/generated data stay local
 .env/
 data/
+# run logs (noisy, progress bars) stay local
+data_*.log

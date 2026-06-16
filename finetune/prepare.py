@@ -30,8 +30,13 @@ def download() -> list[str]:
         out = AUDIO / f"{vid}.wav"
         if not out.exists():
             print(f">>> downloading {vid}", flush=True)
+            # invoke yt-dlp as a module via this interpreter, so it works whether or
+            # not the env's bin is on PATH (running through .env/bin/python does not
+            # put .env/bin on PATH). yt-dlp still needs ffmpeg on PATH for the wav
+            # extraction - see setup.sh for the brew install.
             subprocess.run(
-                ["yt-dlp", "-x", "--audio-format", "wav", "--no-playlist",
+                [sys.executable, "-m", "yt_dlp",
+                 "-x", "--audio-format", "wav", "--no-playlist",
                  "-o", str(AUDIO / f"{vid}.%(ext)s"),
                  f"https://www.youtube.com/watch?v={vid}"],
                 check=True,

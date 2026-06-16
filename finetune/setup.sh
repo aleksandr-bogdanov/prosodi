@@ -12,6 +12,13 @@ set -euo pipefail
 HERE="$(cd "$(dirname "$0")" && pwd)"
 ENV="${HERE}/.env"
 
+# ffmpeg is a system binary (not a pip dep). yt-dlp needs it to extract wav in
+# prepare.py. It is not bundled in the env, so check for it up front.
+if ! command -v ffmpeg >/dev/null 2>&1; then
+  echo ">>> WARNING: ffmpeg not found on PATH - prepare.py's audio download will fail."
+  echo "    install it before ./run.sh:   brew install ffmpeg"
+fi
+
 echo ">>> creating env at ${ENV}"
 uv venv "${ENV}" --python 3.12
 
