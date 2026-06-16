@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Dropzone from "../components/Dropzone";
+import Recorder from "../components/Recorder";
 import JobProgress from "../components/JobProgress";
 import AudioPlayer from "../components/AudioPlayer";
 import MarkerText, { MarkerLegend } from "../components/MarkerText";
@@ -18,6 +19,7 @@ export default function Reconstruct({
   const [busy, setBusy] = useState<{ p: number; msg: string } | null>(null);
   const [res, setRes] = useState<ReconstructResult | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [mode, setMode] = useState<"record" | "upload">("record");
 
   async function onFile(f: File) {
     if (!voice) return;
@@ -60,7 +62,36 @@ export default function Reconstruct({
         </button>
       </div>
 
-      {!res && !busy && <Dropzone onFile={onFile} />}
+      {!res && !busy && (
+        <div className="card p-6">
+          <div className="mb-6 flex justify-center gap-2">
+            <button
+              className={`btn text-sm ${mode === "record" ? "btn-primary" : ""}`}
+              onClick={() => setMode("record")}
+            >
+              Record
+            </button>
+            <button
+              className={`btn text-sm ${mode === "upload" ? "btn-primary" : ""}`}
+              onClick={() => setMode("upload")}
+            >
+              Upload
+            </button>
+          </div>
+          {mode === "record" ? (
+            <>
+              <Recorder onComplete={onFile} minSeconds={3} />
+              <p className="mx-auto mt-5 max-w-md text-center text-xs text-ink-faint">
+                Say a line the way you'd really say it — pauses, hesitations, tempo and all.
+                We measure your prosody, then rebuild it in{" "}
+                <span style={{ color: "var(--color-accent)" }}>{voice.name}</span>'s voice.
+              </p>
+            </>
+          ) : (
+            <Dropzone onFile={onFile} />
+          )}
+        </div>
+      )}
       {busy && (
         <div className="card p-6">
           <JobProgress progress={busy.p} message={busy.msg} />
