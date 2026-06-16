@@ -61,9 +61,10 @@ class Handler(BaseHTTPRequestHandler):
         model, lat, spk = STATE
         out_dir = Path(req["out_dir"])
         out_dir.mkdir(parents=True, exist_ok=True)
+        speed = float(req.get("speed", 1.0))
         clips = []
         for i, text in enumerate(req["texts"]):
-            out = model.inference(text, "en", lat, spk, temperature=0.7)
+            out = model.inference(text, "en", lat, spk, temperature=0.7, speed=speed)
             p = out_dir / f"clip_{i}.wav"
             sf.write(str(p), out["wav"], 24000)
             clips.append(str(p))
