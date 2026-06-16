@@ -84,11 +84,5 @@ Rebuild the showcase assets (downloads public-domain clips, clones and scores th
 
 - `prosodi/config.py` holds every threshold, each one relative to the speaker's own baseline.
 - `prosodi/render.py` owns the notation, `prosodi/backends.py` owns the voice synthesis.
-  clone-and-score evidence, and `web/app/HOUSE-STYLE.md` is the design system the app is built on.
-
-## Before you publish this
-
-The git history of this repo contains real voice recordings and voice statistics. If you ever
-open-source it, build the public version from a fresh snapshot of the current files, never from a
-clone of this history, or those recordings travel with it. The committed showcase audio under
-`web/data/examples/` is public-domain LibriVox material and is safe to ship.
+- `EVAL.md` is the run over a public-domain corpus, and `web/app/HOUSE-STYLE.md` is the design
+  system the app is built on.
