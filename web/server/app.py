@@ -10,6 +10,7 @@ Run:  uv run --group web --group synth python -m web.server.app
 """
 
 import json
+import os
 import shutil
 import uuid
 from datetime import datetime, timezone
@@ -239,9 +240,10 @@ async def api_reconstruct(file: UploadFile = File(...), voice_id: str = Form(...
                        "render_url": _media_url(f5),
                        "scorecard": pipeline.verify(record, f5, orig24)})
 
-        # the fine-tuned XTTS when the M5 model is restored (a fixed speaker, so
-        # the comparison is meaningful on clips of that speaker)
-        if pipeline.xtts_available():
+        # the fine-tuned XTTS is dropped from the default comparison: it learned the
+        # voice but cannot be paced to the prosody (see the bake-off writeup). Kept
+        # behind a flag for reference, and the f5 fine-tune will take its slot.
+        if os.environ.get("PROSODI_COMPARE_XTTS") and pipeline.xtts_available():
             prog.set(0.6, "fine-tuned XTTS (torch sidecar, loads a 5GB model)")
             xt = pipeline.xtts_render(record, sdir / "xtts.wav", fit_tempo=fit_tempo,
                                       clause_min_pause_s=clause_min_pause_s)

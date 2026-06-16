@@ -1,0 +1,4 @@
+# the isolated env + all downloaded/generated data + checkpoints stay local
+.env/
+data/
+ckpts/
