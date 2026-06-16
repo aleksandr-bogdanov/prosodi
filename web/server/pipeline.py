@@ -154,6 +154,25 @@ def clone_render(record: dict, ref_clip: Path, out_wav: Path, *,
     return out_wav
 
 
+def xtts_available() -> bool:
+    """True when the fine-tuned XTTS model + sidecar env are present."""
+    from prosodi.backends import XTTSBackend
+    try:
+        XTTSBackend()  # the constructor checks every file it needs exists
+        return True
+    except Exception:
+        return False
+
+
+def xtts_render(record: dict, out_wav: Path, *, fit_tempo: bool = True,
+                clause_min_pause_s: float = 0.3) -> Path:
+    """Render a record through the fine-tuned XTTS (torch sidecar)."""
+    from prosodi.backends import XTTSBackend
+    backend = XTTSBackend(fit_tempo=fit_tempo, clause_min_pause_s=clause_min_pause_s)
+    backend.render(record, out_wav, "prosody")
+    return out_wav
+
+
 def best_ref_window(record: dict, min_s: float = 8.0,
                     max_s: float = 12.0) -> tuple[float, float, str] | None:
     """The densest run of speech in the whole recording, for an f5 reference.

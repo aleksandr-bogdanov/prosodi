@@ -228,17 +228,31 @@ async def api_reconstruct(file: UploadFile = File(...), voice_id: str = Form(...
         wav16 = to_wav(raw, sdir / "input16.wav", 16000)
         orig24 = to_wav(raw, sdir / "original.wav", 24000)
         record = pipeline.analyze(wav16, use_profile=False)
-        prog.set(0.4, f"rebuilding in {v['name']}'s voice")
-        render = pipeline.clone_render(
-            record, voices.ref_path(voice_id), sdir / "reconstructed.wav",
+        models = []
+
+        prog.set(0.35, f"f5 zero-shot clone in {v['name']}'s voice")
+        f5 = pipeline.clone_render(
+            record, voices.ref_path(voice_id), sdir / "f5.wav",
             condition="prosody", fit_tempo=fit_tempo,
             clause_min_pause_s=clause_min_pause_s, ref_text=v["ref_text"])
-        prog.set(0.85, "scoring what survived")
-        card = pipeline.verify(record, render, orig24)
+        models.append({"name": f"f5 zero-shot · {v['name']}",
+                       "render_url": _media_url(f5),
+                       "scorecard": pipeline.verify(record, f5, orig24)})
+
+        # the fine-tuned XTTS when the M5 model is restored (a fixed speaker, so
+        # the comparison is meaningful on clips of that speaker)
+        if pipeline.xtts_available():
+            prog.set(0.6, "fine-tuned XTTS (torch sidecar, loads a 5GB model)")
+            xt = pipeline.xtts_render(record, sdir / "xtts.wav", fit_tempo=fit_tempo,
+                                      clause_min_pause_s=clause_min_pause_s)
+            models.append({"name": "fine-tuned XTTS",
+                           "render_url": _media_url(xt),
+                           "scorecard": pipeline.verify(record, xt, orig24)})
+
+        prog.set(0.92, "done")
         return {"original_url": _media_url(orig24),
-                "render_url": _media_url(render),
                 "view": pipeline.record_to_view(record),
-                "scorecard": card, "voice": _voice_public(v)}
+                "models": models, "voice": _voice_public(v)}
 
     return {"job_id": REGISTRY.submit("reconstruct", body)}
 

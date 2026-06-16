@@ -91,11 +91,16 @@ export interface Voice {
   ref_url: string;
 }
 
+export interface ModelOutput {
+  name: string;
+  render_url: string;
+  scorecard: Scorecard;
+}
+
 export interface ReconstructResult {
   original_url: string;
-  render_url: string;
   view: View;
-  scorecard: Scorecard;
+  models: ModelOutput[];
   voice: Voice;
 }
 

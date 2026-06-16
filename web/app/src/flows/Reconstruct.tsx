@@ -74,17 +74,26 @@ export default function Reconstruct({
 
       {res && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div className="card space-y-4 p-6">
-              <div className="eyebrow">listen</div>
-              <AudioPlayer url={res.original_url} label="original" />
-              <AudioPlayer url={res.render_url} label={`reconstructed · ${voice.name}`} />
+          <div className="card space-y-3 p-6">
+            <div className="flex items-center justify-between">
+              <div className="eyebrow">the original</div>
               <button className="font-mono text-xs text-ink-faint hover:text-accent" onClick={() => setRes(null)}>
                 another clip
               </button>
             </div>
-            <ScoreCard card={res.scorecard} />
+            <AudioPlayer url={res.original_url} label="original" />
           </div>
+
+          <div className={`grid gap-6 ${res.models.length > 1 ? "lg:grid-cols-2" : ""}`}>
+            {res.models.map((m, i) => (
+              <div key={i} className="card space-y-4 p-6">
+                <div className="eyebrow">{m.name}</div>
+                <AudioPlayer url={m.render_url} label="reconstructed" />
+                <ScoreCard card={m.scorecard} />
+              </div>
+            ))}
+          </div>
+
           <div className="card p-6">
             <div className="eyebrow mb-4">what we measured</div>
             <MarkerText view={res.view} />
