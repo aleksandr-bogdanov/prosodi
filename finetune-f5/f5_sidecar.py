@@ -113,13 +113,20 @@ def load_model():
     DEVICE = pick_device()
     ckpt = find_finetuned_ckpt()
     vocab = find_vocab()
-    ref_file, ref_text = pick_reference()
-    ref_seconds = sf.info(ref_file).duration
     print(f"f5 sidecar: device {DEVICE}", flush=True)
     print(f"f5 sidecar: ckpt {ckpt}", flush=True)
     print(f"f5 sidecar: vocab {vocab}", flush=True)
-    print(f"f5 sidecar: ref {Path(ref_file).name} ({ref_seconds:.1f}s) '{ref_text[:50]}'",
-          flush=True)
+    try:
+        ref_file, ref_text = pick_reference()
+        ref_seconds = sf.info(ref_file).duration
+        print(f"f5 sidecar: ref {Path(ref_file).name} ({ref_seconds:.1f}s) "
+              f"'{ref_text[:50]}'", flush=True)
+    except (SystemExit, OSError, ValueError):
+        # no local corpus to pick a startup reference from - fine, the web app
+        # supplies ref_file/ref_text per request.
+        ref_file, ref_text, ref_seconds = None, None, 0.0
+        print("f5 sidecar: no startup reference; each request must supply ref_file/ref_text",
+              flush=True)
     try:
         model = F5TTS(model="F5TTS_v1_Base", ckpt_file=str(ckpt),
                       vocab_file=str(vocab), device=DEVICE)
@@ -130,11 +137,20 @@ def load_model():
     return model, ref_file, ref_text, ref_seconds
 
 
-def render_one(text: str, duration_s, speed: float):
+def render_one(text: str, duration_s, speed: float, ref_file=None, ref_text=None):
     """Render text in the fine-tuned voice. duration_s (s) imposes the generated
-    length via fix_duration (total = ref + gen); None lets f5 pick a natural tempo."""
+    length via fix_duration (total = ref + gen); None lets f5 pick a natural tempo.
+
+    ref_file/ref_text override the startup reference per request - the web app
+    passes the user's saved voice so the fine-tuned render conditions on the same
+    clip as the zero-shot path. When omitted, the startup reference is used."""
     import numpy as np
-    model, ref_file, ref_text, ref_seconds = STATE
+    import soundfile as sf
+    model = STATE[0]
+    if ref_file is None:
+        _, ref_file, ref_text, ref_seconds = STATE
+    else:
+        ref_seconds = sf.info(ref_file).duration
     fix_duration = None
     if duration_s is not None:
         fix_duration = ref_seconds + max(float(duration_s), MIN_CLAUSE_S)
@@ -170,9 +186,11 @@ class Handler(BaseHTTPRequestHandler):
         speed = float(req.get("speed", 1.0))
         texts = req["texts"]
         durations = req.get("durations") or [None] * len(texts)
+        ref_file = req.get("ref_file")
+        ref_text = req.get("ref_text")
         clips = []
         for i, text in enumerate(texts):
-            wav, sr = render_one(text, durations[i], speed)
+            wav, sr = render_one(text, durations[i], speed, ref_file, ref_text)
             p = out_dir / f"clip_{i}.wav"
             sf.write(str(p), wav, sr)
             clips.append(str(p))

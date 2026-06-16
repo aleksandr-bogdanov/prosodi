@@ -240,6 +240,18 @@ async def api_reconstruct(file: UploadFile = File(...), voice_id: str = Form(...
                        "render_url": _media_url(f5),
                        "scorecard": pipeline.verify(record, f5, orig24)})
 
+        # the fine-tuned f5: speaker-specific voice that keeps the per-clause duration
+        # handle (unlike XTTS). Same reference + clause timing as the zero-shot row, so
+        # the only difference heard is the model weights. Shown whenever it is built.
+        if pipeline.f5ft_available():
+            prog.set(0.6, f"fine-tuned f5 in {v['name']}'s voice (torch sidecar)")
+            f5ft = pipeline.f5ft_render(
+                record, sdir / "f5ft.wav", voices.ref_path(voice_id), v["ref_text"],
+                fit_tempo=fit_tempo, clause_min_pause_s=clause_min_pause_s)
+            models.append({"name": f"f5 fine-tuned · {v['name']}",
+                           "render_url": _media_url(f5ft),
+                           "scorecard": pipeline.verify(record, f5ft, orig24)})
+
         # the fine-tuned XTTS is dropped from the default comparison: it learned the
         # voice but cannot be paced to the prosody (see the bake-off writeup). Kept
         # behind a flag for reference, and the f5 fine-tune will take its slot.

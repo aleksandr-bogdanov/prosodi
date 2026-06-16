@@ -467,6 +467,144 @@ class XTTSBackend:
         sf.write(str(out_wav), wave, self.SAMPLE_RATE, subtype="PCM_16")
 
 
+class F5FinetunedBackend:
+    """The fine-tuned f5, run as a warm torch sidecar.
+
+    Same clause assembly and reference handling as F5Backend (the zero-shot MLX
+    path), but renders come from the speaker-fine-tuned f5 checkpoint, loaded once
+    in the finetune-f5 env (finetune-f5/f5_sidecar.py) and reached over localhost.
+    The reason to fine-tune f5 over XTTS: per-clause fix_duration survives the
+    fine-tune, so the sidecar honors a target duration per clause - the same handle
+    this backend drives - with no post-hoc lurching.
+
+    Conditions on the SAME reference clip + transcript as the zero-shot f5 path, so
+    a Reconstruct comparison is apples-to-apples: identical reference, identical
+    clause timing, only the model weights (zero-shot vs fine-tuned) differ. Pass
+    ref_audio=None to fall back to the sidecar's own startup reference.
+    """
+
+    name = "f5ft"
+
+    SAMPLE_RATE = 24_000
+    TRIM_TOP_DB = 30.0
+    FIT_RATE_CLAMP = (0.66, 1.5)
+
+    def __init__(self, ref_audio: Path | None = None, ref_text: str | None = None,
+                 sidecar_python: Path | None = None, trim_seams: bool = True,
+                 fit_tempo: bool = True, clause_min_pause_s: float = 0.4):
+        ft = Path(__file__).resolve().parent.parent / "finetune-f5"
+        self.ref = Path(ref_audio) if ref_audio else None
+        self.ref_text = ref_text
+        self.ckpt_dir = ft / "ckpts" / "prosodi_speaker"
+        self.sidecar_python = (Path(sidecar_python) if sidecar_python
+                               else ft / ".env" / "bin" / "python")
+        self.server_script = ft / "f5_sidecar.py"
+        self.port = int(os.environ.get("PROSODI_F5FT_PORT", "8798"))
+        self.trim_seams = trim_seams
+        self.fit_tempo = fit_tempo
+        self.clause_min_pause_s = clause_min_pause_s
+        ckpts = sorted(self.ckpt_dir.glob("model_*.pt")) if self.ckpt_dir.exists() else []
+        for p in (self.sidecar_python, self.server_script):
+            if not p.exists():
+                raise RuntimeError(f"f5ft backend: missing {p} (build finetune-f5/.env "
+                                   f"and bank the checkpoint, see finetune-f5/HANDOFF.md)")
+        if not ckpts:
+            raise RuntimeError(f"f5ft backend: no fine-tuned checkpoint in {self.ckpt_dir}")
+        if self.ref is not None and not self.ref.exists():
+            raise RuntimeError(f"f5ft backend: reference clip {self.ref} not found")
+
+    def _ensure_server(self) -> None:
+        """Start the warm f5 sidecar if not already up, wait for the model to load."""
+        import time
+        import urllib.request
+        url = f"http://127.0.0.1:{self.port}/"
+
+        def ready() -> bool:
+            try:
+                with urllib.request.urlopen(url, timeout=2) as r:
+                    return r.status == 200
+            except Exception:
+                return False
+
+        if ready():
+            return
+        env = dict(os.environ, CKPT_DIR=str(self.ckpt_dir))
+        log = self.server_script.parent / "f5_sidecar.log"
+        logf = open(log, "w")  # noqa: SIM115 - kept open for the sidecar's lifetime
+        subprocess.Popen([str(self.sidecar_python), str(self.server_script), str(self.port)],
+                         stdout=logf, stderr=subprocess.STDOUT,
+                         start_new_session=True, env=env)
+        for _ in range(180):  # the 1.3 GB ckpt loads fast, MPS warmup can still lag
+            time.sleep(1)
+            if ready():
+                return
+        raise RuntimeError(f"f5ft sidecar did not become ready (see {log})")
+
+    def _sidecar_render(self, texts: list[str], durations: list) -> list[Path]:
+        """Render every clause on the warm sidecar, passing per-clause durations
+        and the shared reference (model already hot)."""
+        import json
+        import tempfile
+        import urllib.request
+        self._ensure_server()
+        work = Path(tempfile.mkdtemp(prefix="f5ft-side-"))
+        payload = {"texts": texts, "durations": durations, "out_dir": str(work)}
+        if self.ref is not None:
+            payload["ref_file"] = str(self.ref)
+        if self.ref_text is not None:
+            payload["ref_text"] = self.ref_text
+        req = json.dumps(payload).encode()
+        r = urllib.request.urlopen(
+            urllib.request.Request(f"http://127.0.0.1:{self.port}/", data=req,
+                                   headers={"Content-Type": "application/json"}),
+            timeout=1800)
+        return [Path(c) for c in json.loads(r.read())["clips"]]
+
+    def _fit_clause(self, wave, target_s: float):
+        """Trim edge silence, time-stretch the speech to target_s (same as f5/xtts)."""
+        import numpy as np
+        if not (self.trim_seams or self.fit_tempo) or wave.size == 0:
+            return wave
+        import librosa
+        w = wave.astype(np.float32)
+        if self.trim_seams:
+            trimmed, _ = librosa.effects.trim(w, top_db=self.TRIM_TOP_DB)
+            if trimmed.size == 0:
+                return wave
+            w = trimmed
+        if self.fit_tempo and target_s and target_s > 0:
+            cur_s = w.size / self.SAMPLE_RATE
+            if cur_s > 0:
+                lo, hi = self.FIT_RATE_CLAMP
+                rate = min(max(cur_s / target_s, lo), hi)
+                if abs(rate - 1.0) > 0.02:
+                    w = librosa.effects.time_stretch(w, rate=rate)
+        return w
+
+    def render(self, record: dict, out_wav: Path, condition: str) -> None:
+        import numpy as np
+        import soundfile as sf
+
+        if condition == "prosody":
+            clauses = split_clauses(record, self.clause_min_pause_s)
+            clips = self._sidecar_render([c["text"] for c in clauses],
+                                         [c["duration_s"] for c in clauses])
+            pieces: list = []
+            for c, clip in zip(clauses, clips):
+                audio, _ = sf.read(str(clip))
+                if audio.ndim > 1:
+                    audio = audio.mean(axis=1)
+                pieces.append(self._fit_clause(audio, c["duration_s"]))
+                if c["gap_after_s"] is not None:
+                    pieces.append(np.zeros(int(round(c["gap_after_s"] * self.SAMPLE_RATE))))
+            wave = np.concatenate(pieces) if pieces else np.zeros(0)
+        else:
+            text = " ".join(w["text"] for w in record["words"])
+            audio, _ = sf.read(str(self._sidecar_render([text], [None])[0]))
+            wave = audio.mean(axis=1) if audio.ndim > 1 else audio
+        sf.write(str(out_wav), wave, self.SAMPLE_RATE, subtype="PCM_16")
+
+
 class ElevenLabsBackend:
     """ElevenLabs cloud TTS. STUB: no network call is implemented.
 
@@ -525,11 +663,14 @@ def make_backends(spec: str, *, pitch: bool = False,
             backends.append(F5Backend(ref_audio=ref_audio))
         elif name == "xtts":
             backends.append(XTTSBackend())
+        elif name == "f5ft":
+            backends.append(F5FinetunedBackend(ref_audio=ref_audio))
         elif name == "elevenlabs":
             backends.append(ElevenLabsBackend())
         else:
             raise ValueError(
-                f"unknown synthesis target '{name}' (available: say, f5, xtts, elevenlabs)")
+                f"unknown synthesis target '{name}' "
+                f"(available: say, f5, f5ft, xtts, elevenlabs)")
     if not backends:
         raise ValueError("no synthesis target given")
     return backends

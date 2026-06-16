@@ -173,6 +173,27 @@ def xtts_render(record: dict, out_wav: Path, *, fit_tempo: bool = True,
     return out_wav
 
 
+def f5ft_available() -> bool:
+    """True when the fine-tuned f5 checkpoint + sidecar env are present."""
+    from prosodi.backends import F5FinetunedBackend
+    try:
+        F5FinetunedBackend(ref_audio=None)  # constructor checks env + checkpoint
+        return True
+    except Exception:
+        return False
+
+
+def f5ft_render(record: dict, out_wav: Path, ref_clip: Path, ref_text: str | None, *,
+                fit_tempo: bool = True, clause_min_pause_s: float = 0.4) -> Path:
+    """Render a record through the fine-tuned f5 (torch sidecar), conditioned on the
+    same reference clip as the zero-shot f5 path so the comparison is apples-to-apples."""
+    from prosodi.backends import F5FinetunedBackend
+    backend = F5FinetunedBackend(ref_audio=ref_clip, ref_text=ref_text,
+                                 fit_tempo=fit_tempo, clause_min_pause_s=clause_min_pause_s)
+    backend.render(record, out_wav, "prosody")
+    return out_wav
+
+
 def best_ref_window(record: dict, min_s: float = 8.0,
                     max_s: float = 12.0) -> tuple[float, float, str] | None:
     """The densest run of speech in the whole recording, for an f5 reference.
