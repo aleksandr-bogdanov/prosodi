@@ -32,24 +32,26 @@ MIN_CLAUSE_S = sc.MIN_CLAUSE_S
 
 def load_finetuned():
     from f5_tts.api import F5TTS
+    dev = sc.pick_device()
     ckpt = sc.find_finetuned_ckpt()
     vocab = sc.find_vocab()
-    print(f"fine-tuned ckpt: {ckpt}\nvocab: {vocab}", flush=True)
+    print(f"fine-tuned ckpt: {ckpt}\nvocab: {vocab}\ndevice: {dev}", flush=True)
     try:
         return F5TTS(model="F5TTS_v1_Base", ckpt_file=str(ckpt),
-                     vocab_file=str(vocab), device="cuda")
+                     vocab_file=str(vocab), device=dev)
     except TypeError:
         return F5TTS(model_type="F5TTS_v1_Base", ckpt_file=str(ckpt),
-                     vocab_file=str(vocab), device="cuda")
+                     vocab_file=str(vocab), device=dev)
 
 
 def load_zeroshot():
     from f5_tts.api import F5TTS
+    dev = sc.pick_device()
     print("zero-shot: stock F5TTS_v1_Base", flush=True)
     try:
-        return F5TTS(model="F5TTS_v1_Base", device="cuda")
+        return F5TTS(model="F5TTS_v1_Base", device=dev)
     except TypeError:
-        return F5TTS(model_type="F5TTS_v1_Base", device="cuda")
+        return F5TTS(model_type="F5TTS_v1_Base", device=dev)
 
 
 def render(model, ref_file, ref_text, text, fix_duration=None):

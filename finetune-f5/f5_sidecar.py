@@ -22,11 +22,28 @@ import sys
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from pathlib import Path
 
+os.environ.setdefault("PYTORCH_ENABLE_MPS_FALLBACK", "1")  # MPS has unsupported ops
+
 HERE = Path(__file__).resolve().parent
 SAMPLE_RATE = 24_000
 MIN_CLAUSE_S = 0.4           # same floor the MLX F5Backend imposes
 
 STATE = None  # (model, ref_file, ref_text, ref_seconds) once loaded
+
+
+def pick_device() -> str:
+    """cuda on the cloud box, mps on Alex's Mac, cpu as the floor. Override with DEVICE."""
+    if os.environ.get("DEVICE"):
+        return os.environ["DEVICE"]
+    import torch
+    if torch.cuda.is_available():
+        return "cuda"
+    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
+DEVICE = None  # resolved lazily in load_model (avoids importing torch at module load)
 
 
 def _venv_root() -> Path:
@@ -52,8 +69,14 @@ def find_vocab() -> Path:
     v = os.environ.get("VOCAB_FILE")
     if v:
         return Path(v)
-    # the 2545-token pinyin vocab the finetune trained against
-    return _venv_root() / "data" / "prosodi_speaker_pinyin" / "vocab.txt"
+    # the 2545-token pinyin vocab the finetune trained against; on a box that built
+    # the dataset it sits in the f5 data dir, otherwise fall back to the identical
+    # vocab the f5-tts package ships (the finetune used the stock pinyin vocab).
+    ds = _venv_root() / "data" / "prosodi_speaker_pinyin" / "vocab.txt"
+    if ds.exists():
+        return ds
+    import f5_tts
+    return Path(list(f5_tts.__path__)[0]) / "infer" / "examples" / "vocab.txt"
 
 
 def pick_reference() -> tuple[str, str]:
@@ -83,24 +106,27 @@ def pick_reference() -> tuple[str, str]:
 
 
 def load_model():
+    global DEVICE
     import soundfile as sf
     from f5_tts.api import F5TTS
 
+    DEVICE = pick_device()
     ckpt = find_finetuned_ckpt()
     vocab = find_vocab()
     ref_file, ref_text = pick_reference()
     ref_seconds = sf.info(ref_file).duration
+    print(f"f5 sidecar: device {DEVICE}", flush=True)
     print(f"f5 sidecar: ckpt {ckpt}", flush=True)
     print(f"f5 sidecar: vocab {vocab}", flush=True)
     print(f"f5 sidecar: ref {Path(ref_file).name} ({ref_seconds:.1f}s) '{ref_text[:50]}'",
           flush=True)
     try:
         model = F5TTS(model="F5TTS_v1_Base", ckpt_file=str(ckpt),
-                      vocab_file=str(vocab), device="cuda")
+                      vocab_file=str(vocab), device=DEVICE)
     except TypeError:
         # older f5-tts used model_type= instead of model=
         model = F5TTS(model_type="F5TTS_v1_Base", ckpt_file=str(ckpt),
-                      vocab_file=str(vocab), device="cuda")
+                      vocab_file=str(vocab), device=DEVICE)
     return model, ref_file, ref_text, ref_seconds
 
 
