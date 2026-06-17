@@ -23,6 +23,25 @@ export default function Voices({
   const [region, setRegion] = useState<{ start: number; end: number } | null>(null);
   const [busy, setBusy] = useState<{ p: number; msg: string } | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [editRegion, setEditRegion] = useState<{ start: number; end: number } | null>(null);
+  const [editBusy, setEditBusy] = useState<{ p: number; msg: string } | null>(null);
+
+  async function saveRef(id: string) {
+    if (!editRegion) return;
+    setErr(null);
+    setEditBusy({ p: 0, msg: "cutting the new reference" });
+    try {
+      await api.setReference(id, editRegion, (p, msg) => setEditBusy({ p, msg }));
+      setEditId(null);
+      setEditRegion(null);
+      onChange();
+    } catch (e) {
+      setErr(String(e));
+    } finally {
+      setEditBusy(null);
+    }
+  }
 
   async function create() {
     if (!pending) return;
@@ -139,6 +158,51 @@ export default function Voices({
                 </button>
               </div>
               <AudioPlayer url={v.ref_url} label="reference" compact />
+
+              {v.source_url && (
+                <div
+                  className="mt-3 border-t border-line-soft pt-3"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {editId === v.id ? (
+                    <div className="space-y-3">
+                      <RegionPicker url={v.source_url} onRegion={setEditRegion} />
+                      {editBusy ? (
+                        <JobProgress progress={editBusy.p} message={editBusy.msg} />
+                      ) : (
+                        <div className="flex gap-2">
+                          <button
+                            className="btn btn-primary text-sm"
+                            disabled={!editRegion}
+                            onClick={() => saveRef(v.id)}
+                          >
+                            Save reference
+                          </button>
+                          <button
+                            className="btn btn-ghost text-sm"
+                            onClick={() => {
+                              setEditId(null);
+                              setEditRegion(null);
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <button
+                      className="font-mono text-xs text-ink-faint hover:text-accent"
+                      onClick={() => {
+                        setEditId(v.id);
+                        setEditRegion(null);
+                      }}
+                    >
+                      edit reference — scrub a new clip
+                    </button>
+                  )}
+                </div>
+              )}
             </motion.div>
           ))}
         </div>

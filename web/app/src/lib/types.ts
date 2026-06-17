@@ -89,6 +89,7 @@ export interface Voice {
   created: string;
   ref_s: number;
   ref_url: string;
+  source_url?: string;
 }
 
 export interface ModelOutput {

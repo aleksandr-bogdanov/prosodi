@@ -47,7 +47,7 @@ def ref_path(vid: str) -> Path:
 
 
 def save_voice(name: str, ref_wav: Path, ref_text: str, source: str,
-               created: str) -> dict:
+               created: str, source_audio: Path | None = None) -> dict:
     """Persist a reference clip as a named voice. created is an ISO stamp the
     caller supplies (the script layer cannot read the clock)."""
     import shutil
@@ -58,6 +58,9 @@ def save_voice(name: str, ref_wav: Path, ref_text: str, source: str,
     d.mkdir(parents=True, exist_ok=True)
     dst = d / "ref.wav"
     shutil.copy(ref_wav, dst)
+    # keep the full source so the reference can be re-cut later (the scrubber)
+    if source_audio is not None:
+        shutil.copy(source_audio, d / "source.wav")
     meta = {
         "id": vid,
         "name": name.strip() or "untitled voice",
@@ -66,6 +69,26 @@ def save_voice(name: str, ref_wav: Path, ref_text: str, source: str,
         "created": created,
         "ref_s": round(sf.info(str(dst)).duration, 2),
     }
+    _meta_path(vid).write_text(json.dumps(meta, ensure_ascii=False, indent=1),
+                               encoding="utf-8")
+    return meta
+
+
+def source_path(vid: str) -> Path:
+    return VOICES_DIR / vid / "source.wav"
+
+
+def set_reference(vid: str, ref_wav: Path, ref_text: str) -> dict:
+    """Replace a saved voice's reference clip + transcript, keeping id/name/source."""
+    import shutil
+    import soundfile as sf
+    meta = get_voice(vid)
+    if meta is None:
+        raise ValueError(f"unknown voice {vid}")
+    dst = VOICES_DIR / vid / "ref.wav"
+    shutil.copy(ref_wav, dst)
+    meta["ref_text"] = ref_text
+    meta["ref_s"] = round(sf.info(str(dst)).duration, 2)
     _meta_path(vid).write_text(json.dumps(meta, ensure_ascii=False, indent=1),
                                encoding="utf-8")
     return meta

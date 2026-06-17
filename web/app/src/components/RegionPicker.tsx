@@ -4,14 +4,15 @@ import RegionsPlugin from "wavesurfer.js/dist/plugins/regions.esm.js";
 import { cssVar } from "../lib/theme";
 
 interface Props {
-  file: File;
+  file?: File;
+  url?: string;
   defaultLen?: number; // seconds for the initial region
   onRegion: (r: { start: number; end: number }) => void;
 }
 
 /** Scrub a recording and drag a region to pick the exact reference window.
- * The region starts at a sensible spot; the user nudges it to the cleanest take. */
-export default function RegionPicker({ file, defaultLen = 12, onRegion }: Props) {
+ * Takes a File (a fresh upload) or a url (an existing voice's stored source). */
+export default function RegionPicker({ file, url, defaultLen = 12, onRegion }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const ws = useRef<WaveSurfer | null>(null);
   const region = useRef<{ start: number; end: number } | null>(null);
@@ -19,10 +20,12 @@ export default function RegionPicker({ file, defaultLen = 12, onRegion }: Props)
 
   useEffect(() => {
     if (!container.current) return;
-    const url = URL.createObjectURL(file);
+    const objectUrl = file ? URL.createObjectURL(file) : null;
+    const audioUrl = objectUrl ?? url;
+    if (!audioUrl) return;
     const wave = WaveSurfer.create({
       container: container.current,
-      url,
+      url: audioUrl,
       height: 84,
       waveColor: cssVar("--color-line") || "#ccc",
       progressColor: cssVar("--color-accent") || "#0d9488",
@@ -63,10 +66,10 @@ export default function RegionPicker({ file, defaultLen = 12, onRegion }: Props)
     return () => {
       wave.destroy();
       ws.current = null;
-      URL.revokeObjectURL(url);
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [file]);
+  }, [file, url]);
 
   const dur = sel ? (sel.end - sel.start).toFixed(1) : "--";
 

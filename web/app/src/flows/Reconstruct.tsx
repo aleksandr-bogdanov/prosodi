@@ -9,6 +9,14 @@ import type { ReconstructResult, Voice } from "../lib/types";
 const PLACEHOLDER = `Type a line, or add prosody markers:
 I genuinely <pause 0.6s> don't know what to *tell* you.`;
 
+// A worked example so the box is never blank: pauses, emphasis and a stretch,
+// the markers Reconstruct actually imposes on f5.
+const DEFAULT_NOTATION =
+  "So <pause 0.7s> here is the whole idea. " +
+  "I *measure* how you speak <pause 0.4s> the pauses, the tempo, the stress, <pause 0.4s> " +
+  "and write<stretched 1.6x> it all down. " +
+  "Then <pause 0.5s> any voice can read it back.";
+
 /** Module 2: prosodi notation (typed or carried from Capture) -> voice -> audio. */
 export default function Reconstruct({
   voice,
@@ -21,7 +29,7 @@ export default function Reconstruct({
   seedKey: number;
   onGoToVoices: () => void;
 }) {
-  const [notation, setNotation] = useState("");
+  const [notation, setNotation] = useState(DEFAULT_NOTATION);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [busy, setBusy] = useState<{ p: number; msg: string } | null>(null);
   const [res, setRes] = useState<ReconstructResult | null>(null);

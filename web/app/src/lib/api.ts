@@ -110,6 +110,17 @@ export async function deleteVoice(id: string): Promise<void> {
   await fetch(`/api/voices/${id}`, { method: "DELETE" });
 }
 
+export async function setReference(
+  voiceId: string,
+  region: { start: number; end: number },
+  onProgress?: (p: number, msg: string) => void,
+): Promise<Voice> {
+  const form = new FormData();
+  form.append("ref_start", String(region.start));
+  form.append("ref_end", String(region.end));
+  return pollJob<Voice>(await submit(`/api/voices/${voiceId}/reref`, form), onProgress);
+}
+
 export async function reconstruct(
   notation: string,
   voiceId: string,

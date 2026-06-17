@@ -171,7 +171,10 @@ def _now() -> str:
 
 
 def _voice_public(v: dict) -> dict:
-    return {**v, "ref_url": f"/voices/{v['id']}/ref.wav"}
+    d = {**v, "ref_url": f"/voices/{v['id']}/ref.wav"}
+    if voices.source_path(v["id"]).exists():
+        d["source_url"] = f"/voices/{v['id']}/source.wav"
+    return d
 
 
 @app.post("/api/voices")
@@ -198,11 +201,39 @@ async def api_create_voice(file: UploadFile = File(...), name: str = Form(""),
             record = pipeline.analyze(wav16, use_profile=False)
             ref, ref_text = pipeline.build_voice_ref(record, hq, tmp / "ref.wav")
         prog.set(0.85, "saving the voice")
-        meta = voices.save_voice(label, ref, ref_text, file.filename or "", _now())
+        meta = voices.save_voice(label, ref, ref_text, file.filename or "", _now(),
+                                 source_audio=hq)
         shutil.rmtree(tmp, ignore_errors=True)
         return _voice_public(meta)
 
     return {"job_id": REGISTRY.submit("voice", body)}
+
+
+@app.post("/api/voices/{voice_id}/reref")
+async def api_reref(voice_id: str, ref_start: float = Form(...),
+                    ref_end: float = Form(...)):
+    """Re-cut a saved voice's reference from its stored source (the scrubber)."""
+    v = voices.get_voice(voice_id)
+    if not v:
+        raise HTTPException(404, "unknown voice")
+    src = voices.source_path(voice_id)
+    if not src.exists():
+        raise HTTPException(400, "this voice has no stored source to re-cut from "
+                                 "(re-create it to enable editing the reference)")
+
+    def body(prog):
+        tmp = WORK / ("reref-" + uuid.uuid4().hex[:8])
+        tmp.mkdir(parents=True, exist_ok=True)
+        prog.set(0.3, "cutting the new reference")
+        ref = tmp / "ref.wav"
+        pipeline.slice_to(src, ref, ref_start, ref_end)
+        prog.set(0.65, "transcribing the reference")
+        ref_text = pipeline.transcribe_text(ref)
+        meta = voices.set_reference(voice_id, ref, ref_text)
+        shutil.rmtree(tmp, ignore_errors=True)
+        return _voice_public(meta)
+
+    return {"job_id": REGISTRY.submit("reref", body)}
 
 
 @app.get("/api/voices")
