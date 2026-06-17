@@ -250,6 +250,23 @@ def verify(orig_record: dict, render_wav: Path, orig_wav: Path) -> dict:
     return scorecard(orig_record, rend_record, orig_wav, render_wav)
 
 
+def shift_pitch(wav: Path, semitones: float) -> None:
+    """Transpose a rendered clip by N semitones, in place (base-pitch control).
+
+    Pitch only: duration is preserved, so the prosody timing (pauses, tempo) is
+    untouched. f5 does not honor a pitch target itself, so this is the register
+    knob - a uniform shift of the whole contour, not per-word pitch shaping."""
+    if not semitones:
+        return
+    import librosa
+    import soundfile as sf
+    y, sr = sf.read(str(wav))
+    if y.ndim > 1:
+        y = y.mean(axis=1)
+    y = librosa.effects.pitch_shift(y.astype("float32"), sr=sr, n_steps=float(semitones))
+    sf.write(str(wav), y, sr, subtype="PCM_16")
+
+
 # --- the guessing game ---------------------------------------------------
 
 def slice_record(record: dict, t_end: float) -> dict:

@@ -254,7 +254,8 @@ async def api_delete_voice(voice_id: str):
 async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
                           session_id: str | None = Form(None),
                           fit_tempo: bool = Form(True),
-                          clause_min_pause_s: float = Form(0.4)):
+                          clause_min_pause_s: float = Form(0.4),
+                          pitch_st: float = Form(0.0)):
     """Render prosodi notation in a saved voice.
 
     The notation may be typed by hand or carried (and optionally edited) from a
@@ -275,15 +276,22 @@ async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
         prog.set(0.12, "reading the notation")
         if sess and notation.strip() == (sess.get("notation") or "").strip():
             record, condition = sess["record"], "prosody"   # unedited: precise record
+            orig = sess["wav16k"]                            # score against the capture
         else:
             record = parse_notation(notation)
             condition = "prosody" if has_timing_markers(notation) else "control"
-        orig = sess["wav16k"] if sess else None
+            # a parsed/edited spec has no measured acoustics, so it cannot be scored
+            # against the original (verify needs the measured tempo/f0 fields).
+            orig = None
         sdir.mkdir(parents=True, exist_ok=True)
         models = []
 
-        def score(rendered):
-            return pipeline.verify(record, rendered, orig) if orig else None
+        def finalize(rendered):
+            # score the prosody realization BEFORE transposing, then shift the base
+            # pitch for playback (duration, and so the timing, is preserved)
+            card = pipeline.verify(record, rendered, orig) if orig else None
+            pipeline.shift_pitch(rendered, pitch_st)
+            return card
 
         prog.set(0.3, f"f5 zero-shot in {v['name']}'s voice")
         f5 = pipeline.clone_render(
@@ -291,7 +299,7 @@ async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
             condition=condition, fit_tempo=fit_tempo,
             clause_min_pause_s=clause_min_pause_s, ref_text=v["ref_text"])
         models.append({"name": f"f5 zero-shot · {v['name']}",
-                       "render_url": _media_url(f5), "scorecard": score(f5)})
+                       "render_url": _media_url(f5), "scorecard": finalize(f5)})
 
         # the fine-tuned f5: speaker-specific voice that keeps the per-clause duration
         # handle (unlike XTTS), same reference + clause timing as the zero-shot row, so
@@ -303,7 +311,7 @@ async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
                 condition=condition, fit_tempo=fit_tempo,
                 clause_min_pause_s=clause_min_pause_s)
             models.append({"name": f"f5 fine-tuned · {v['name']}",
-                           "render_url": _media_url(f5ft), "scorecard": score(f5ft)})
+                           "render_url": _media_url(f5ft), "scorecard": finalize(f5ft)})
 
         prog.set(0.92, "done")
         return {"original_url": _media_url(orig) if orig else None,

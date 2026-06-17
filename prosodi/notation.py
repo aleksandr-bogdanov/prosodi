@@ -111,6 +111,8 @@ def parse_notation(text: str, *, default_cps: float = DEFAULT_CPS,
         "language": language,
         "words": words,
         "pauses": pauses,
+        "tempo_spans": [],  # synthesized record carries no measured tempo spans
+        "stretch_spans": [],
         "utterance": {
             "duration_s": round(t, 3),
             "n_words": len(words),

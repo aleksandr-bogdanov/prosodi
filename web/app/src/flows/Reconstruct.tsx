@@ -31,6 +31,7 @@ export default function Reconstruct({
 }) {
   const [notation, setNotation] = useState(DEFAULT_NOTATION);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [pitchSt, setPitchSt] = useState(0);
   const [busy, setBusy] = useState<{ p: number; msg: string } | null>(null);
   const [res, setRes] = useState<ReconstructResult | null>(null);
   const [err, setErr] = useState<string | null>(null);
@@ -53,7 +54,9 @@ export default function Reconstruct({
     setBusy({ p: 0, msg: "starting" });
     try {
       setRes(
-        await api.reconstruct(notation, voice.id, sessionId, (p, msg) => setBusy({ p, msg })),
+        await api.reconstruct(notation, voice.id, sessionId, pitchSt, (p, msg) =>
+          setBusy({ p, msg }),
+        ),
       );
     } catch (e) {
       setErr(String(e));
@@ -111,6 +114,25 @@ export default function Reconstruct({
           placeholder={PLACEHOLDER}
           spellCheck={false}
         />
+        <div className="flex items-center gap-3">
+          <span className="whitespace-nowrap font-mono text-xs text-ink-faint">base pitch</span>
+          <input
+            type="range"
+            min={-6}
+            max={6}
+            step={0.5}
+            value={pitchSt}
+            onChange={(e) => setPitchSt(Number(e.target.value))}
+            className="flex-1 accent-[var(--color-accent)]"
+          />
+          <span
+            className="font-mono text-xs tabular-nums"
+            style={{ color: "var(--color-accent)", minWidth: "3.2rem", textAlign: "right" }}
+          >
+            {pitchSt > 0 ? "+" : ""}
+            {pitchSt} st
+          </span>
+        </div>
         <div className="flex items-center justify-between gap-3">
           <span className="font-mono text-xs text-ink-faint">
             markers: &lt;pause 0.6s&gt; · *emphasis* · word&lt;stretched 1.8x&gt;

@@ -125,12 +125,14 @@ export async function reconstruct(
   notation: string,
   voiceId: string,
   sessionId: string | null,
+  pitchSt: number,
   onProgress?: (p: number, msg: string) => void,
 ): Promise<ReconstructResult> {
   const form = new FormData();
   form.append("notation", notation);
   form.append("voice_id", voiceId);
   if (sessionId) form.append("session_id", sessionId);
+  form.append("pitch_st", String(pitchSt));
   return pollJob<ReconstructResult>(await submit("/api/reconstruct", form), onProgress);
 }
 
