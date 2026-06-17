@@ -110,6 +110,14 @@ export async function deleteVoice(id: string): Promise<void> {
   await fetch(`/api/voices/${id}`, { method: "DELETE" });
 }
 
+export async function renameVoice(id: string, name: string): Promise<Voice> {
+  const form = new FormData();
+  form.append("name", name);
+  const r = await fetch(`/api/voices/${id}/rename`, { method: "POST", body: form });
+  if (!r.ok) throw new Error(`rename failed: ${r.status}`);
+  return (await r.json()) as Voice;
+}
+
 export async function setReference(
   voiceId: string,
   region: { start: number; end: number },

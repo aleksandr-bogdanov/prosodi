@@ -26,6 +26,20 @@ export default function Voices({
   const [editId, setEditId] = useState<string | null>(null);
   const [editRegion, setEditRegion] = useState<{ start: number; end: number } | null>(null);
   const [editBusy, setEditBusy] = useState<{ p: number; msg: string } | null>(null);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState("");
+
+  async function saveRename(id: string) {
+    setRenamingId(null);
+    const name = renameValue.trim();
+    if (!name) return;
+    try {
+      await api.renameVoice(id, name);
+      onChange();
+    } catch (e) {
+      setErr(String(e));
+    }
+  }
 
   async function saveRef(id: string) {
     if (!editRegion) return;
@@ -139,7 +153,22 @@ export default function Voices({
                       </svg>
                     )}
                   </span>
-                  <span className="font-medium">{v.name}</span>
+                  {renamingId === v.id ? (
+                    <input
+                      value={renameValue}
+                      autoFocus
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={(e) => setRenameValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") saveRename(v.id);
+                        if (e.key === "Escape") setRenamingId(null);
+                      }}
+                      onBlur={() => saveRename(v.id)}
+                      className="rounded border border-line bg-transparent px-2 py-0.5 text-sm font-medium focus:border-accent focus:outline-none"
+                    />
+                  ) : (
+                    <span className="font-medium">{v.name}</span>
+                  )}
                   <span className="chip">{v.ref_s}s ref</span>
                   {v.id === activeId && (
                     <span className="font-mono text-xs" style={{ color: "var(--color-accent)" }}>
@@ -147,15 +176,27 @@ export default function Voices({
                     </span>
                   )}
                 </div>
-                <button
-                  className="font-mono text-xs text-ink-faint hover:text-[var(--color-m-agitated)]"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    api.deleteVoice(v.id).then(onChange);
-                  }}
-                >
-                  delete
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    className="font-mono text-xs text-ink-faint hover:text-accent"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setRenamingId(v.id);
+                      setRenameValue(v.name);
+                    }}
+                  >
+                    rename
+                  </button>
+                  <button
+                    className="font-mono text-xs text-ink-faint hover:text-[var(--color-m-agitated)]"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      api.deleteVoice(v.id).then(onChange);
+                    }}
+                  >
+                    delete
+                  </button>
+                </div>
               </div>
               <AudioPlayer url={v.ref_url} label="reference" compact />
 

@@ -78,6 +78,16 @@ def source_path(vid: str) -> Path:
     return VOICES_DIR / vid / "source.wav"
 
 
+def rename(vid: str, name: str) -> dict:
+    meta = get_voice(vid)
+    if meta is None:
+        raise ValueError(f"unknown voice {vid}")
+    meta["name"] = name.strip() or meta["name"]
+    _meta_path(vid).write_text(json.dumps(meta, ensure_ascii=False, indent=1),
+                               encoding="utf-8")
+    return meta
+
+
 def set_reference(vid: str, ref_wav: Path, ref_text: str) -> dict:
     """Replace a saved voice's reference clip + transcript, keeping id/name/source."""
     import shutil

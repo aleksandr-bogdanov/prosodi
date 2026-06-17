@@ -245,6 +245,13 @@ async def api_list_voices():
     return {"voices": [_voice_public(v) for v in voices.list_voices()]}
 
 
+@app.post("/api/voices/{voice_id}/rename")
+async def api_rename_voice(voice_id: str, name: str = Form(...)):
+    if not voices.get_voice(voice_id):
+        raise HTTPException(404, "unknown voice")
+    return _voice_public(voices.rename(voice_id, name))
+
+
 @app.delete("/api/voices/{voice_id}")
 async def api_delete_voice(voice_id: str):
     return {"deleted": voices.delete_voice(voice_id)}
