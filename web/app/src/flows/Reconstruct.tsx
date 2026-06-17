@@ -12,10 +12,10 @@ I genuinely <pause 0.6s> don't know what to *tell* you.`;
 // A worked example so the box is never blank: pauses, emphasis and a stretch,
 // the markers Reconstruct actually imposes on f5.
 const DEFAULT_NOTATION =
-  "So <pause 0.7s> here is the whole idea. " +
-  "I *measure* how you speak <pause 0.4s> the pauses, the tempo, the stress, <pause 0.4s> " +
-  "and write<stretched 1.6x> it all down. " +
-  "Then <pause 0.5s> any voice can read it back.";
+  "Listen. <pause 0.6s> I *wasn't* going to tell you this. <pause 0.4s> " +
+  "But <slower> here we are<stretched 1.5x>, </slower> <pause 0.7s> " +
+  "<faster> so lean in </faster> <rise> and let me explain. <fall> <pause 0.5s> " +
+  "the way it *actually* happened.";
 
 /** Module 2: prosodi notation (typed or carried from Capture) -> voice -> audio. */
 export default function Reconstruct({
