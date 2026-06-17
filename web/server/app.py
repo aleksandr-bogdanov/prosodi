@@ -301,10 +301,12 @@ async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
         models.append({"name": f"f5 zero-shot · {v['name']}",
                        "render_url": _media_url(f5), "scorecard": finalize(f5)})
 
-        # the fine-tuned f5: speaker-specific voice that keeps the per-clause duration
-        # handle (unlike XTTS), same reference + clause timing as the zero-shot row, so
-        # only the model weights differ. Shown whenever the checkpoint is built.
-        if pipeline.f5ft_available():
+        # The fine-tuned f5 is parked, like XTTS before it: the public-YouTube fine-tune
+        # proved a voice tune keeps f5's duration handle, but the lossy training data left
+        # it lo-fi and it loses to zero-shot in practice. Behind PROSODI_COMPARE_F5FT for
+        # when a clean-data fine-tune is worth revisiting. Default off also halves render
+        # memory (one model, not two).
+        if os.environ.get("PROSODI_COMPARE_F5FT") and pipeline.f5ft_available():
             prog.set(0.6, f"fine-tuned f5 in {v['name']}'s voice")
             f5ft = pipeline.f5ft_render(
                 record, sdir / "f5ft.wav", voices.ref_path(voice_id), v["ref_text"],
