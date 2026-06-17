@@ -126,6 +126,7 @@ export async function reconstruct(
   voiceId: string,
   sessionId: string | null,
   pitchSt: number,
+  models: { zeroshot: boolean; finetuned: boolean },
   onProgress?: (p: number, msg: string) => void,
 ): Promise<ReconstructResult> {
   const form = new FormData();
@@ -133,7 +134,19 @@ export async function reconstruct(
   form.append("voice_id", voiceId);
   if (sessionId) form.append("session_id", sessionId);
   form.append("pitch_st", String(pitchSt));
+  form.append("render_zeroshot", String(models.zeroshot));
+  form.append("render_finetuned", String(models.finetuned));
   return pollJob<ReconstructResult>(await submit("/api/reconstruct", form), onProgress);
+}
+
+export async function getHealth(): Promise<{ ok: boolean; ffmpeg: boolean; f5ft: boolean }> {
+  try {
+    const r = await fetch("/api/health");
+    if (!r.ok) return { ok: false, ffmpeg: false, f5ft: false };
+    return (await r.json()) as { ok: boolean; ffmpeg: boolean; f5ft: boolean };
+  } catch {
+    return { ok: false, ffmpeg: false, f5ft: false };
+  }
 }
 
 export async function getExamples(): Promise<ExamplesManifest> {

@@ -255,7 +255,9 @@ async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
                           session_id: str | None = Form(None),
                           fit_tempo: bool = Form(True),
                           clause_min_pause_s: float = Form(0.4),
-                          pitch_st: float = Form(0.0)):
+                          pitch_st: float = Form(0.0),
+                          render_zeroshot: bool = Form(True),
+                          render_finetuned: bool = Form(False)):
     """Render prosodi notation in a saved voice.
 
     The notation may be typed by hand or carried (and optionally edited) from a
@@ -293,20 +295,20 @@ async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
             pipeline.shift_pitch(rendered, pitch_st)
             return card
 
-        prog.set(0.3, f"f5 zero-shot in {v['name']}'s voice")
-        f5 = pipeline.clone_render(
-            record, voices.ref_path(voice_id), sdir / "f5.wav",
-            condition=condition, fit_tempo=fit_tempo,
-            clause_min_pause_s=clause_min_pause_s, ref_text=v["ref_text"])
-        models.append({"name": f"f5 zero-shot · {v['name']}",
-                       "render_url": _media_url(f5), "scorecard": finalize(f5)})
+        if render_zeroshot:
+            prog.set(0.3, f"f5 zero-shot in {v['name']}'s voice")
+            f5 = pipeline.clone_render(
+                record, voices.ref_path(voice_id), sdir / "f5.wav",
+                condition=condition, fit_tempo=fit_tempo,
+                clause_min_pause_s=clause_min_pause_s, ref_text=v["ref_text"])
+            models.append({"name": f"f5 zero-shot · {v['name']}",
+                           "render_url": _media_url(f5), "scorecard": finalize(f5)})
 
-        # The fine-tuned f5 is parked, like XTTS before it: the public-YouTube fine-tune
-        # proved a voice tune keeps f5's duration handle, but the lossy training data left
-        # it lo-fi and it loses to zero-shot in practice. Behind PROSODI_COMPARE_F5FT for
-        # when a clean-data fine-tune is worth revisiting. Default off also halves render
-        # memory (one model, not two).
-        if os.environ.get("PROSODI_COMPARE_F5FT") and pipeline.f5ft_available():
+        # The fine-tuned f5 is opt-in (checkbox, default off): the public-YouTube fine-tune
+        # proved a voice tune keeps f5's duration handle but is lo-fi from lossy training
+        # data and loses to zero-shot. Kept for the clean-data run; checking it loads a
+        # second model, so leaving it off keeps render memory to one model.
+        if render_finetuned and pipeline.f5ft_available():
             prog.set(0.6, f"fine-tuned f5 in {v['name']}'s voice")
             f5ft = pipeline.f5ft_render(
                 record, sdir / "f5ft.wav", voices.ref_path(voice_id), v["ref_text"],
@@ -344,7 +346,8 @@ async def api_examples():
 @app.get("/api/health")
 async def api_health():
     from .audio import FFMPEG
-    return {"ok": True, "ffmpeg": FFMPEG is not None}
+    return {"ok": True, "ffmpeg": FFMPEG is not None,
+            "f5ft": pipeline.f5ft_available()}
 
 
 # --- static --------------------------------------------------------------

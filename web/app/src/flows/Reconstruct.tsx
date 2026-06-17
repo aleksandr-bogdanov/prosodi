@@ -35,6 +35,13 @@ export default function Reconstruct({
   const [busy, setBusy] = useState<{ p: number; msg: string } | null>(null);
   const [res, setRes] = useState<ReconstructResult | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [zeroshot, setZeroshot] = useState(true);
+  const [finetuned, setFinetuned] = useState(false);
+  const [f5ftAvail, setF5ftAvail] = useState(false);
+
+  useEffect(() => {
+    api.getHealth().then((h) => setF5ftAvail(h.f5ft));
+  }, []);
 
   // load a capture handoff when one arrives (keyed so edits don't re-trigger it)
   useEffect(() => {
@@ -48,14 +55,19 @@ export default function Reconstruct({
   }, [seedKey]);
 
   async function render() {
-    if (!voice || !notation.trim()) return;
+    if (!voice || !notation.trim() || (!zeroshot && !finetuned)) return;
     setErr(null);
     setRes(null);
     setBusy({ p: 0, msg: "starting" });
     try {
       setRes(
-        await api.reconstruct(notation, voice.id, sessionId, pitchSt, (p, msg) =>
-          setBusy({ p, msg }),
+        await api.reconstruct(
+          notation,
+          voice.id,
+          sessionId,
+          pitchSt,
+          { zeroshot, finetuned: finetuned && f5ftAvail },
+          (p, msg) => setBusy({ p, msg }),
         ),
       );
     } catch (e) {
@@ -133,11 +145,40 @@ export default function Reconstruct({
             {pitchSt} st
           </span>
         </div>
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs text-ink-soft">
+          <span className="text-ink-faint">render</span>
+          <label className="flex cursor-pointer items-center gap-2">
+            <input
+              type="checkbox"
+              checked={zeroshot}
+              onChange={(e) => setZeroshot(e.target.checked)}
+              className="accent-[var(--color-accent)]"
+            />
+            zero-shot f5
+          </label>
+          <label
+            className={`flex items-center gap-2 ${f5ftAvail ? "cursor-pointer" : "opacity-40"}`}
+            title={f5ftAvail ? "loads a second model (more RAM)" : "no fine-tuned checkpoint built"}
+          >
+            <input
+              type="checkbox"
+              checked={finetuned && f5ftAvail}
+              disabled={!f5ftAvail}
+              onChange={(e) => setFinetuned(e.target.checked)}
+              className="accent-[var(--color-accent)]"
+            />
+            fine-tuned f5 {f5ftAvail ? "(experimental)" : "(not built)"}
+          </label>
+        </div>
         <div className="flex items-center justify-between gap-3">
           <span className="font-mono text-xs text-ink-faint">
             markers: &lt;pause 0.6s&gt; · *emphasis* · word&lt;stretched 1.8x&gt;
           </span>
-          <button className="btn btn-primary" disabled={!!busy || !notation.trim()} onClick={render}>
+          <button
+            className="btn btn-primary"
+            disabled={!!busy || !notation.trim() || (!zeroshot && !finetuned)}
+            onClick={render}
+          >
             {busy ? "rendering..." : "Render"}
           </button>
         </div>
@@ -162,14 +203,32 @@ export default function Reconstruct({
         >
           {res.original_url && (
             <div className="card space-y-3 p-6">
-              <div className="eyebrow">the original</div>
+              <div className="flex items-center justify-between">
+                <div className="eyebrow">the original</div>
+                <a
+                  href={res.original_url}
+                  download="original.wav"
+                  className="font-mono text-xs text-ink-faint hover:text-accent"
+                >
+                  download wav
+                </a>
+              </div>
               <AudioPlayer url={res.original_url} label="original" />
             </div>
           )}
           <div className={`grid gap-6 ${res.models.length > 1 ? "lg:grid-cols-2" : ""}`}>
             {res.models.map((m, i) => (
               <div key={i} className="card space-y-4 p-6">
-                <div className="eyebrow">{m.name}</div>
+                <div className="flex items-center justify-between">
+                  <div className="eyebrow">{m.name}</div>
+                  <a
+                    href={m.render_url}
+                    download={`${m.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}.wav`}
+                    className="font-mono text-xs text-ink-faint hover:text-accent"
+                  >
+                    download wav
+                  </a>
+                </div>
                 <AudioPlayer url={m.render_url} label="reconstructed" />
                 {m.scorecard && <ScoreCard card={m.scorecard} />}
               </div>
