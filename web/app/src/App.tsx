@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTheme } from "./lib/theme";
 import Voices from "./flows/Voices";
+import Capture from "./flows/Capture";
 import Reconstruct from "./flows/Reconstruct";
 import LiveGame from "./flows/LiveGame";
 import * as api from "./lib/api";
 import type { Voice } from "./lib/types";
 
-type Tab = "voices" | "reconstruct" | "guess";
+type Tab = "voices" | "capture" | "reconstruct" | "guess";
 const TABS: { id: Tab; label: string; blurb: string }[] = [
   { id: "voices", label: "Voices", blurb: "Drop a recording, keep the voice. ~12 seconds is all it needs." },
-  { id: "reconstruct", label: "Reconstruct", blurb: "Rebuild any clip in a saved voice and compare." },
+  { id: "capture", label: "Capture", blurb: "Record or upload, and read the prosody back as editable notation." },
+  { id: "reconstruct", label: "Reconstruct", blurb: "Render notation - captured or typed - in a saved voice." },
   { id: "guess", label: "Guess yourself", blurb: "Read a passage, then pick yourself out of the clones." },
 ];
 
@@ -59,6 +61,14 @@ export default function App() {
   const [tab, setTab] = useState<Tab>("voices");
   const [voices, setVoices] = useState<Voice[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [seed, setSeed] = useState<{ notation: string; sessionId: string } | null>(null);
+  const [seedKey, setSeedKey] = useState(0);
+
+  function handoff(notation: string, sessionId: string) {
+    setSeed({ notation, sessionId });
+    setSeedKey((k) => k + 1);
+    setTab("reconstruct");
+  }
 
   const refresh = () =>
     api.listVoices().then((vs) => {
@@ -146,8 +156,14 @@ export default function App() {
             {tab === "voices" && (
               <Voices voices={voices} activeId={activeId} onSelect={setActiveId} onChange={refresh} />
             )}
+            {tab === "capture" && <Capture onReconstruct={handoff} />}
             {tab === "reconstruct" && (
-              <Reconstruct voice={active} onGoToVoices={() => setTab("voices")} />
+              <Reconstruct
+                voice={active}
+                seed={seed}
+                seedKey={seedKey}
+                onGoToVoices={() => setTab("voices")}
+              />
             )}
             {tab === "guess" && <LiveGame />}
           </motion.div>

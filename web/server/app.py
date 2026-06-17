@@ -67,9 +67,12 @@ async def api_analyze(file: UploadFile = File(...),
     def body(prog):
         prog.set(0.2, "transcribing + measuring acoustics")
         record = pipeline.analyze(wav16k, use_profile=use_profile)
-        SESSIONS[sid] = {"wav16k": wav16k, "record": record}
         prog.set(0.95, "building the annotation")
         view = pipeline.record_to_view(record)
+        # keep the notation too: Reconstruct uses the precise record when the
+        # notation comes back unedited, and parses it when the user has edited it.
+        SESSIONS[sid] = {"wav16k": wav16k, "record": record,
+                         "notation": view.get("notation", "")}
         return {"session_id": sid, "view": view,
                 "audio_url": _media_url(wav16k)}
 
@@ -213,58 +216,62 @@ async def api_delete_voice(voice_id: str):
 
 
 @app.post("/api/reconstruct")
-async def api_reconstruct(file: UploadFile = File(...), voice_id: str = Form(...),
+async def api_reconstruct(notation: str = Form(...), voice_id: str = Form(...),
+                          session_id: str | None = Form(None),
                           fit_tempo: bool = Form(True),
-                          clause_min_pause_s: float = Form(0.3)):
-    """Annotate a clip and rebuild it in a saved voice, original vs reconstructed."""
+                          clause_min_pause_s: float = Form(0.4)):
+    """Render prosodi notation in a saved voice.
+
+    The notation may be typed by hand or carried (and optionally edited) from a
+    Capture. When it is the unedited notation of a capture session, the precise
+    measured record is rendered; an edit or typed text is parsed from the notation
+    (synthesized timing). With a session, each render is scored against the captured
+    original; typed-only renders have no original, so no scorecard.
+    """
+    from prosodi.notation import has_timing_markers, parse_notation
     v = voices.get_voice(voice_id)
     if not v:
         raise HTTPException(404, "unknown voice (create one first)")
+    sess = SESSIONS.get(session_id) if session_id else None
     sid = uuid.uuid4().hex[:12]
     sdir = WORK / sid
-    raw = _save_upload(file, sdir)
 
     def body(prog):
-        prog.set(0.15, "measuring the prosody")
-        wav16 = to_wav(raw, sdir / "input16.wav", 16000)
-        orig24 = to_wav(raw, sdir / "original.wav", 24000)
-        record = pipeline.analyze(wav16, use_profile=False)
+        prog.set(0.12, "reading the notation")
+        if sess and notation.strip() == (sess.get("notation") or "").strip():
+            record, condition = sess["record"], "prosody"   # unedited: precise record
+        else:
+            record = parse_notation(notation)
+            condition = "prosody" if has_timing_markers(notation) else "control"
+        orig = sess["wav16k"] if sess else None
+        sdir.mkdir(parents=True, exist_ok=True)
         models = []
 
-        prog.set(0.35, f"f5 zero-shot clone in {v['name']}'s voice")
+        def score(rendered):
+            return pipeline.verify(record, rendered, orig) if orig else None
+
+        prog.set(0.3, f"f5 zero-shot in {v['name']}'s voice")
         f5 = pipeline.clone_render(
             record, voices.ref_path(voice_id), sdir / "f5.wav",
-            condition="prosody", fit_tempo=fit_tempo,
+            condition=condition, fit_tempo=fit_tempo,
             clause_min_pause_s=clause_min_pause_s, ref_text=v["ref_text"])
         models.append({"name": f"f5 zero-shot · {v['name']}",
-                       "render_url": _media_url(f5),
-                       "scorecard": pipeline.verify(record, f5, orig24)})
+                       "render_url": _media_url(f5), "scorecard": score(f5)})
 
         # the fine-tuned f5: speaker-specific voice that keeps the per-clause duration
-        # handle (unlike XTTS). Same reference + clause timing as the zero-shot row, so
-        # the only difference heard is the model weights. Shown whenever it is built.
+        # handle (unlike XTTS), same reference + clause timing as the zero-shot row, so
+        # only the model weights differ. Shown whenever the checkpoint is built.
         if pipeline.f5ft_available():
-            prog.set(0.6, f"fine-tuned f5 in {v['name']}'s voice (torch sidecar)")
+            prog.set(0.6, f"fine-tuned f5 in {v['name']}'s voice")
             f5ft = pipeline.f5ft_render(
                 record, sdir / "f5ft.wav", voices.ref_path(voice_id), v["ref_text"],
-                fit_tempo=fit_tempo, clause_min_pause_s=clause_min_pause_s)
+                condition=condition, fit_tempo=fit_tempo,
+                clause_min_pause_s=clause_min_pause_s)
             models.append({"name": f"f5 fine-tuned · {v['name']}",
-                           "render_url": _media_url(f5ft),
-                           "scorecard": pipeline.verify(record, f5ft, orig24)})
-
-        # the fine-tuned XTTS is dropped from the default comparison: it learned the
-        # voice but cannot be paced to the prosody (see the bake-off writeup). Kept
-        # behind a flag for reference, and the f5 fine-tune will take its slot.
-        if os.environ.get("PROSODI_COMPARE_XTTS") and pipeline.xtts_available():
-            prog.set(0.6, "fine-tuned XTTS (torch sidecar, loads a 5GB model)")
-            xt = pipeline.xtts_render(record, sdir / "xtts.wav", fit_tempo=fit_tempo,
-                                      clause_min_pause_s=clause_min_pause_s)
-            models.append({"name": "fine-tuned XTTS",
-                           "render_url": _media_url(xt),
-                           "scorecard": pipeline.verify(record, xt, orig24)})
+                           "render_url": _media_url(f5ft), "scorecard": score(f5ft)})
 
         prog.set(0.92, "done")
-        return {"original_url": _media_url(orig24),
+        return {"original_url": _media_url(orig) if orig else None,
                 "view": pipeline.record_to_view(record),
                 "models": models, "voice": _voice_public(v)}
 

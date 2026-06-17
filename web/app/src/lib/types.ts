@@ -94,11 +94,11 @@ export interface Voice {
 export interface ModelOutput {
   name: string;
   render_url: string;
-  scorecard: Scorecard;
+  scorecard: Scorecard | null;
 }
 
 export interface ReconstructResult {
-  original_url: string;
+  original_url: string | null;
   view: View;
   models: ModelOutput[];
   voice: Voice;

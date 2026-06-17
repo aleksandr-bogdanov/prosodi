@@ -111,13 +111,15 @@ export async function deleteVoice(id: string): Promise<void> {
 }
 
 export async function reconstruct(
-  file: File,
+  notation: string,
   voiceId: string,
+  sessionId: string | null,
   onProgress?: (p: number, msg: string) => void,
 ): Promise<ReconstructResult> {
   const form = new FormData();
-  form.append("file", file);
+  form.append("notation", notation);
   form.append("voice_id", voiceId);
+  if (sessionId) form.append("session_id", sessionId);
   return pollJob<ReconstructResult>(await submit("/api/reconstruct", form), onProgress);
 }
 

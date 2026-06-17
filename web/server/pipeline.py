@@ -184,13 +184,15 @@ def f5ft_available() -> bool:
 
 
 def f5ft_render(record: dict, out_wav: Path, ref_clip: Path, ref_text: str | None, *,
-                fit_tempo: bool = True, clause_min_pause_s: float = 0.4) -> Path:
+                condition: str = "prosody", fit_tempo: bool = True,
+                clause_min_pause_s: float = 0.4) -> Path:
     """Render a record through the fine-tuned f5 (torch sidecar), conditioned on the
-    same reference clip as the zero-shot f5 path so the comparison is apples-to-apples."""
+    same reference clip as the zero-shot f5 path so the comparison is apples-to-apples.
+    condition 'control' renders the whole text at the model's natural tempo."""
     from prosodi.backends import F5FinetunedBackend
     backend = F5FinetunedBackend(ref_audio=ref_clip, ref_text=ref_text,
                                  fit_tempo=fit_tempo, clause_min_pause_s=clause_min_pause_s)
-    backend.render(record, out_wav, "prosody")
+    backend.render(record, out_wav, condition)
     return out_wav
 
 
