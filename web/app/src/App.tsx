@@ -84,8 +84,8 @@ export default function App() {
   const blurb = TABS.find((t) => t.id === tab)!.blurb;
 
   return (
-    <div className="min-h-screen bg-dotgrid pt-16">
-      <header className="fixed inset-x-0 top-0 z-30 border-b border-line-soft glass">
+    <div className="min-h-screen bg-dotgrid">
+      <header className="relative z-30 border-b border-line-soft glass">
         <div className="shell flex h-16 items-center justify-between">
           <Wordmark />
           <nav className="hidden items-center gap-1 sm:flex">
