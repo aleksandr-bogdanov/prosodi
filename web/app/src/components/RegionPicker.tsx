@@ -8,26 +8,30 @@ interface Props {
   url?: string;
   defaultLen?: number; // seconds for the initial region
   minLen?: number; // f5 clones badly below ~3s
-  maxLen?: number; // f5 timbre saturates by ~12s
+  maxLen?: number; // f5 timbre saturates by ~12s, 15 leaves room without hurting it
   onRegion: (r: { start: number; end: number }) => void;
 }
 
 /** Scrub a recording and drag a region to pick the exact reference window.
  * Takes a File (a fresh upload) or a url (an existing voice's stored source).
- * The region is clamped to [minLen, maxLen] and can be auditioned before saving. */
+ * The region clamps to [minLen, maxLen]; dragging the LEFT edge auto-previews the
+ * onset (so you can land the start on a pause, not mid-word); a zoom slider makes
+ * tight selections on long sources workable; the selection can be auditioned. */
 export default function RegionPicker({
   file,
   url,
-  defaultLen = 10,
+  defaultLen = 12,
   minLen = 3,
-  maxLen = 12,
+  maxLen = 15,
   onRegion,
 }: Props) {
   const container = useRef<HTMLDivElement>(null);
   const ws = useRef<WaveSurfer | null>(null);
   const region = useRef<{ start: number; end: number } | null>(null);
+  const fit = useRef<number>(1); // px/sec that fits the whole source
   const [sel, setSel] = useState<{ start: number; end: number } | null>(null);
   const [playing, setPlaying] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   useEffect(() => {
     if (!container.current) return;
@@ -45,11 +49,15 @@ export default function RegionPicker({
       barGap: 1,
       barRadius: 2,
       normalize: true,
+      minPxPerSec: 1,
     });
     ws.current = wave;
     const regions = wave.registerPlugin(RegionsPlugin.create());
 
     wave.on("decode", (duration: number) => {
+      fit.current = Math.max(1, (container.current?.clientWidth ?? 640) / duration);
+      setZoom(fit.current);
+
       const len = Math.min(Math.max(defaultLen, minLen), maxLen, duration);
       const start = Math.max(0, Math.min(duration * 0.15, duration - len));
       const r = regions.addRegion({
@@ -59,8 +67,10 @@ export default function RegionPicker({
         drag: true,
         resize: true,
       });
-      // clamp to [minLen, maxLen] on every resize/drag, then report
-      const sync = () => {
+      // clamp to [minLen, maxLen] on every resize/drag, report, and when the LEFT
+      // edge is the one that moved, play the onset so the start can land on a pause
+      const report = (autoPreview: boolean) => {
+        const prev = region.current;
         const s = r.start;
         let e = r.end;
         const dur = e - s;
@@ -70,9 +80,17 @@ export default function RegionPicker({
         region.current = { start: s, end: e };
         setSel({ start: s, end: e });
         onRegion(region.current);
+        if (autoPreview && prev && ws.current) {
+          const movedStart = Math.abs(s - prev.start);
+          const movedEnd = Math.abs(e - prev.end);
+          if (movedStart > 0.02 && movedStart >= movedEnd) {
+            ws.current.play(s, Math.min(e, s + 2.0));
+            setPlaying(true);
+          }
+        }
       };
-      sync();
-      r.on("update-end", sync);
+      report(false);
+      r.on("update-end", () => report(true));
     });
     // keep a single region: clicking the wave should not spawn new ones
     regions.enableDragSelection({ color: "transparent" });
@@ -104,12 +122,18 @@ export default function RegionPicker({
     }
   }
 
+  function onZoom(v: number) {
+    setZoom(v);
+    ws.current?.zoom(v);
+  }
+
   const dur = sel ? (sel.end - sel.start).toFixed(1) : "--";
+  const zoomMax = Math.max(fit.current * 30, 80);
 
   return (
     <div>
       <div ref={container} className="w-full cursor-text" />
-      <div className="mt-3 flex items-center justify-between gap-3 font-mono text-xs text-ink-faint">
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-xs text-ink-faint">
         <button
           onClick={togglePlay}
           disabled={!sel}
@@ -118,9 +142,19 @@ export default function RegionPicker({
         >
           {playing ? "■ stop" : "▶ play selection"}
         </button>
-        <span className="flex-1 text-right">
-          drag the box to the clearest stretch ({minLen}-{maxLen}s)
-        </span>
+        <label className="flex items-center gap-2">
+          zoom
+          <input
+            type="range"
+            min={fit.current}
+            max={zoomMax}
+            step={0.5}
+            value={zoom}
+            onChange={(e) => onZoom(Number(e.target.value))}
+            className="w-28 accent-[var(--color-accent)]"
+          />
+        </label>
+        <span className="flex-1 text-right">drag to the clearest stretch ({minLen}-{maxLen}s)</span>
         <span style={{ color: "var(--color-accent)" }}>
           {sel ? `${sel.start.toFixed(1)}-${sel.end.toFixed(1)}s` : ""} ({dur}s)
         </span>
