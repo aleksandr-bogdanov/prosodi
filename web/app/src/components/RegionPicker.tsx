@@ -99,6 +99,7 @@ export default function RegionPicker({
       if (all.length > 1) r.remove();
     });
 
+    wave.on("play", () => setPlaying(true));
     wave.on("pause", () => setPlaying(false));
     wave.on("finish", () => setPlaying(false));
 
@@ -109,6 +110,22 @@ export default function RegionPicker({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file, url]);
+
+  // spacebar toggles the selection preview, unless a field is focused
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.code !== "Space") return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+      const wave = ws.current;
+      if (!wave || !region.current) return;
+      e.preventDefault();
+      if (wave.isPlaying()) wave.pause();
+      else wave.play(region.current.start, region.current.end);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   function togglePlay() {
     const wave = ws.current;

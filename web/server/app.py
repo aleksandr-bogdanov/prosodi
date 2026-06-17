@@ -171,7 +171,11 @@ def _now() -> str:
 
 
 def _voice_public(v: dict) -> dict:
-    d = {**v, "ref_url": f"/voices/{v['id']}/ref.wav"}
+    # cache-bust ref_url by the file's mtime so a re-cut reference actually reloads
+    # in the browser (the path is unchanged, only the bytes are).
+    ref = voices.ref_path(v["id"])
+    rev = int(ref.stat().st_mtime) if ref.exists() else 0
+    d = {**v, "ref_url": f"/voices/{v['id']}/ref.wav?t={rev}"}
     if voices.source_path(v["id"]).exists():
         d["source_url"] = f"/voices/{v['id']}/source.wav"
     return d
