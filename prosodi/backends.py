@@ -587,8 +587,14 @@ class F5FinetunedBackend:
 
         if condition == "prosody":
             clauses = split_clauses(record, self.clause_min_pause_s)
+            # Render each clause at the model's NATURAL length (no imposed fix_duration),
+            # then time-stretch to the measured duration. Imposing a duration on the
+            # fine-tuned model lets it pad spare budget by echoing its reference (the
+            # speaker it was tuned on bleeds in at clause ends); a natural render stops
+            # at the text, and fit_clause hits the target via DSP - the zero-shot path's
+            # proven behavior. fix_duration still works (verified), it just invites the echo.
             clips = self._sidecar_render([c["text"] for c in clauses],
-                                         [c["duration_s"] for c in clauses])
+                                         [None for _ in clauses])
             pieces: list = []
             for c, clip in zip(clauses, clips):
                 audio, _ = sf.read(str(clip))
