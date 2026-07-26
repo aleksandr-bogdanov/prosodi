@@ -1,6 +1,6 @@
 # prosodi
 
-**Speech to text, without losing the speech.**
+Speech to text, without losing the speech.
 
 When you talk to your computer and it writes down what you said, it keeps the words and throws
 away how you said them. The long pause before you changed your mind. The word you leaned on. The
@@ -86,3 +86,7 @@ Rebuild the showcase assets (downloads public-domain clips, clones and scores th
 - `prosodi/render.py` owns the notation, `prosodi/backends.py` owns the voice synthesis.
 - `EVAL.md` is the run over a public-domain corpus, and `web/app/HOUSE-STYLE.md` is the design
   system the app is built on.
+
+---
+
+<img src=".github/mark.svg" height="15" alt=""> built by [bogdanov.wtf](https://bogdanov.wtf)
